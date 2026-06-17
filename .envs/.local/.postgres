@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=oscar_web_app
+POSTGRES_USER=pPhgoyQuMFLewwqcaochrZNPUhDqzrNy
+POSTGRES_PASSWORD=UgPHn1TmONo3ifLms6Yf7ziifih6hqL0ID0iKNYemViWsLRg985GEaBwvDLiZazG
