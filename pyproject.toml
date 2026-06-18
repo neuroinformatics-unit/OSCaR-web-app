@@ -29,11 +29,12 @@ dependencies = [
   "flower==2.0.1",
   "gunicorn==26.0.0",
   "hiredis==3.4.0",
+  "oscar-colony==0.0.4",
   "pillow==12.2.0",
   "psycopg[c]==3.3.4",
   "python-slugify==8.0.4",
   "redis==8.0.0",
-  "whitenoise==6.12.0",
+  "whitenoise==6.12.0"
 ]
 
 [dependency-groups]
