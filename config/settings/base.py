@@ -82,7 +82,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "oscar_web_app.users",
-    "oscar_web_app.optimser",
+    "oscar_web_app.optimiser",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
