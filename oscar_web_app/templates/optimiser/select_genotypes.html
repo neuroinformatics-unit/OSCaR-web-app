@@ -2,10 +2,10 @@
 
 {% block title %}Select genotypes{% endblock title %}
 {% block content %}
-  <p>DIfferent text</p>
+  <h1>Select line and genotypes</h1>
   <form action="" method="post">
     {% csrf_token %}
-    {{ form }}
+    {{ line_form }}
     {{ genotype_formset }}
     <input type="submit" value="Submit" />
   </form>

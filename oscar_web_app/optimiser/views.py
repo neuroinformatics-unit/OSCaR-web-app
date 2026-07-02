@@ -6,24 +6,23 @@ from .forms import LineForm
 
 def select_genotypes(request):
 
+    context = {}
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
-        form = LineForm(request.POST)
+        line_form = LineForm(request.POST)
 
-        context = {"form": form}
-        line = request.POST.get("line")
-        if line:
-            # Fetches mutations from API
-            mutations = ["Mut-A", "Mut-B", "Mut-C"]
-            genotype_formset = GenotypeFormSet(
-                form_kwargs={"mutation_names": mutations}
-            )
-        else:
-            genotype_formset = None
+        if line_form.is_valid():
+            line = line_form.cleaned_data["line"]
 
+            if line:
+                # Fetches mutations from API
+                mutations = ["Mut-A", "Mut-B", "Mut-C"]
+                genotype_formset = GenotypeFormSet(
+                    form_kwargs={"mutation_names": mutations}
+                )
+                context["genotype_formset"] = genotype_formset
     else:
-        form = LineForm()
-        genotype_formset = None
+        line_form = LineForm()
 
-    context = {"form": form, "genotype_formset": genotype_formset}
+    context["line_form"] = line_form
     return render(request, "optimiser/select_genotypes.html", context)

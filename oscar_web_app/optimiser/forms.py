@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import formset_factory
+from oscar_colony.breeding_scheme import Genotype
 
 
 class LineForm(forms.Form):
@@ -19,7 +20,13 @@ class GenotypeForm(forms.Form):
         # mutations is a kwarg
         if mutation_names:
             for mutation_name in mutation_names:
-                self.fields[mutation_name] = forms.CharField()
+                self.fields[mutation_name] = forms.ChoiceField(
+                    choices=(
+                        (Genotype.WT, "WT"),
+                        (Genotype.HET, "HET"),
+                        (Genotype.HOM, "HOM"),
+                    )
+                )
 
 
 GenotypeFormSet = formset_factory(GenotypeForm)
