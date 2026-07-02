@@ -1,1 +1,12 @@
 {% extends "base.html" %}
+
+{% block title %}Select genotypes{% endblock title %}
+{% block content %}
+  <p>DIfferent text</p>
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ form }}
+    {{ genotype_formset }}
+    <input type="submit" value="Submit" />
+  </form>
+{% endblock content %}
