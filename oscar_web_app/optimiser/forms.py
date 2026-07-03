@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import BaseFormSet
 from django.forms import formset_factory
 from oscar_colony.breeding_scheme import Genotype
 
@@ -29,4 +30,14 @@ class GenotypeForm(forms.Form):
                 )
 
 
-GenotypeFormSet = formset_factory(GenotypeForm, extra=2, can_delete=True)
+# A formset where the can_delete checkbox is hidden by default
+class HiddenDeleteFormSet(BaseFormSet):
+    def add_fields(self, form, index):
+        super().add_fields(form, index)
+        if "DELETE" in form.fields:
+            form.fields["DELETE"].widget = forms.HiddenInput()
+
+
+GenotypeFormSet = formset_factory(
+    GenotypeForm, formset=HiddenDeleteFormSet, extra=2, can_delete=True
+)
