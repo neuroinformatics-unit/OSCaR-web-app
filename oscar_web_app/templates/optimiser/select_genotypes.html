@@ -6,7 +6,23 @@
   <form action="" method="post">
     {% csrf_token %}
     {{ line_form }}
-    {{ genotype_formset }}
-    <input type="submit" value="Submit" />
+    {{ formset.management_form }}
+    <div id="genotype-forms">
+      {% for form in formset %}
+        <div class="form-row">
+          {{ form }}
+          <button type="button" class="remove-form">X</button>
+        </div>
+      {% endfor %}
+    </div>
+    <button type="button" id="add-genotype">Add Genotype</button>
+    <input type="submit" value="Calculate optimal breeding schemes" />
+    <!-- Hidden empty form, used via js for adding new rows -->
+    <template id="empty-form">
+      <div class="form-row">
+        {{ formset.empty_form }}
+        <button type="button" class="remove-form">X</button>
+      </div>
+    </template>
   </form>
 {% endblock content %}

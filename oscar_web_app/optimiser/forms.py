@@ -29,4 +29,4 @@ class GenotypeForm(forms.Form):
                 )
 
 
-GenotypeFormSet = formset_factory(GenotypeForm)
+GenotypeFormSet = formset_factory(GenotypeForm, extra=2, can_delete=True)

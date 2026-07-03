@@ -20,7 +20,7 @@ def select_genotypes(request):
                 genotype_formset = GenotypeFormSet(
                     form_kwargs={"mutation_names": mutations}
                 )
-                context["genotype_formset"] = genotype_formset
+                context["formset"] = genotype_formset
     else:
         line_form = LineForm()
 
