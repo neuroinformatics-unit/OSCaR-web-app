@@ -1,11 +1,22 @@
-const addButton = document.getElementById("add-genotype");
+const lineDropdown = document.querySelector("select#id_line");
+const form = document.querySelector("form");
+const addButton = document.querySelector("#add-genotype");
 const removeButtons = document.querySelectorAll(".remove-genotype");
-const genotypeForms = document.getElementById("genotype-forms");
-const totalForms = document.getElementById("id_form-TOTAL_FORMS");
-const emptyTemplate = document.getElementById("empty-form")
+const genotypeForms = document.querySelector("#genotype-forms");
+const totalForms = document.querySelector("#id_form-TOTAL_FORMS");
+const emptyTemplate = document.querySelector("#empty-form")
 
 addButton.addEventListener("click", addGenotype);
-genotypeForms.addEventListener('click', removeGenotype);
+genotypeForms.addEventListener("click", removeGenotype);
+lineDropdown.addEventListener("change", submitForm)
+
+function submitForm(e) {
+    let dropdown = e.target;
+    let selectedOption = dropdown.options[dropdown.selectedIndex].value;
+    if (selectedOption != "") {
+        form.submit();
+    }
+}
 
 function addGenotype() {
     const nForms = Number(totalForms.value);

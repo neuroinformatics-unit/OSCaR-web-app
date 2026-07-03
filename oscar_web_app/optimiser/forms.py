@@ -7,7 +7,12 @@ from oscar_colony.breeding_scheme import Genotype
 class LineForm(forms.Form):
     line = forms.ChoiceField(
         label="Line",
-        choices=(("a", "option-a"), ("b", "option-b"), ("c", "option-c")),
+        choices=(
+            ("", "---------"),
+            ("a", "option-a"),
+            ("b", "option-b"),
+            ("c", "option-c"),
+        ),
         required=True,
     )
 
