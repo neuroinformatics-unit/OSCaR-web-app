@@ -1,17 +1,19 @@
 {% extends "base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block title %}Select genotypes{% endblock title %}
 {% block content %}
   <h1>Select line and genotypes</h1>
   <form action="" method="post">
     {% csrf_token %}
-    {{ line_form }}
+    {% crispy line_form %}
     {{ formset.management_form }}
     <div id="genotype-forms">
       {% for form in formset %}
         <div class="form-row">
-          {{ form }}
-          <button type="button" class="remove-genotype">X</button>
+          {% crispy form %}
+          {% comment %} <button type="button" class="remove-genotype">X</button> {% endcomment %}
         </div>
       {% endfor %}
     </div>
@@ -20,8 +22,8 @@
     <!-- Hidden empty form, used via js for adding new rows -->
     <template id="empty-form">
       <div class="form-row">
-        {{ formset.empty_form }}
-        <button type="button" class="remove-genotype">X</button>
+        {% crispy formset.empty_form %}
+        {% comment %} <button type="button" class="remove-genotype">X</button> {% endcomment %}
       </div>
     </template>
   </form>

@@ -1,3 +1,8 @@
+from crispy_forms.bootstrap import StrictButton
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Column
+from crispy_forms.layout import Layout
+from crispy_forms.layout import Row
 from django import forms
 from django.forms import BaseFormSet
 from django.forms import formset_factory
@@ -22,6 +27,12 @@ class LineForm(forms.Form):
         required=True,
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+
 
 class GenotypeForm(forms.Form):
     count = forms.IntegerField()
@@ -39,6 +50,22 @@ class GenotypeForm(forms.Form):
                         (Genotype.HOM, "HOM"),
                     )
                 )
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        self.helper.layout = Layout(
+            Row(
+                *(Column(name) for name in mutation_names),
+                Column("count"),
+                Column(
+                    StrictButton(
+                        "X", type="button", css_class="btn btn-primary remove-genotype"
+                    ),
+                    css_class="mb-3 d-flex align-items-end",
+                ),
+            )
+        )
 
 
 # A formset where the can_delete checkbox is hidden by default
