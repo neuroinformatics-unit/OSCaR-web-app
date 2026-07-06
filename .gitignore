@@ -275,4 +275,5 @@ oscar_web_app/media/
 .ipython/
 .env
 .envs/*
-!.envs/.local/
+!.envs/.local/.django
+!.envs/.local/.postgres
