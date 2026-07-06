@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from oscar_colony.colony_management.pyrat.api import get_pyrat_line_mutations
 
 from .forms import GenotypeFormSet
 from .forms import LineForm
@@ -12,11 +13,11 @@ def select_genotypes(request):
         line_form = LineForm(request.POST)
 
         if line_form.is_valid():
-            line = line_form.cleaned_data["line"]
+            line_id = line_form.cleaned_data["line"]
 
-            if line:
+            if line_id:
                 # Fetches mutations from API
-                mutations = ["Mut-A", "Mut-B", "Mut-C"]
+                mutations = get_pyrat_line_mutations(line_id)
                 genotype_formset = GenotypeFormSet(
                     form_kwargs={"mutation_names": mutations}
                 )

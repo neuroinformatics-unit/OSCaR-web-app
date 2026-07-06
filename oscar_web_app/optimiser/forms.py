@@ -10,7 +10,7 @@ def _fetch_line_choices():
     lines = [("", "--------")]
 
     for line_df in get_pyrat_lines():
-        lines.extend([(line_name, line_name) for line_name in line_df["name"]])
+        lines.extend([(row.id, row.name) for row in line_df.itertuples(index=False)])
 
     return lines
 
@@ -50,5 +50,5 @@ class HiddenDeleteFormSet(BaseFormSet):
 
 
 GenotypeFormSet = formset_factory(
-    GenotypeForm, formset=HiddenDeleteFormSet, extra=2, can_delete=True
+    GenotypeForm, formset=HiddenDeleteFormSet, extra=1, can_delete=True
 )
