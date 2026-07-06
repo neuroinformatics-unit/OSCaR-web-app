@@ -2,17 +2,23 @@ from django import forms
 from django.forms import BaseFormSet
 from django.forms import formset_factory
 from oscar_colony.breeding_scheme import Genotype
+from oscar_colony.colony_management.pyrat.api import get_pyrat_lines
+
+
+def _fetch_line_choices():
+    # Start with an empty default choice
+    lines = [("", "--------")]
+
+    for line_df in get_pyrat_lines():
+        lines.extend([(line_name, line_name) for line_name in line_df["name"]])
+
+    return lines
 
 
 class LineForm(forms.Form):
     line = forms.ChoiceField(
         label="Line",
-        choices=(
-            ("", "---------"),
-            ("a", "option-a"),
-            ("b", "option-b"),
-            ("c", "option-c"),
-        ),
+        choices=_fetch_line_choices,
         required=True,
     )
 
