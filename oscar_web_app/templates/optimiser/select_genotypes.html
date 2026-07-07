@@ -12,14 +12,18 @@
       {{ formset.management_form }}
       <div id="genotype-forms">
         {% for form in formset %}
-          <div class="form-row">{% crispy form %}</div>
+          {% crispy form %}
         {% endfor %}
       </div>
-      <button type="button" id="add-genotype">Add Genotype</button>
-      <input type="submit" value="Calculate optimal breeding schemes" />
+      <button type="button" id="add-genotype" class="btn btn-secondary d-block">Add Genotype</button>
+      <div class="d-flex justify-content-center">
+        <input type="submit"
+               class="btn btn-primary mt-4"
+               value="Calculate optimal breeding schemes" />
+      </div>
       <!-- Hidden empty form, used via js for adding new rows -->
       <template id="empty-form">
-        <div class="form-row">{% crispy formset.empty_form %}</div>
+        {% crispy formset.empty_form %}
       </template>
     {% endif %}
   </form>

@@ -62,7 +62,9 @@ class GenotypeForm(forms.Form):
                 Column("count"),
                 Column(
                     StrictButton(
-                        "X", type="button", css_class="btn btn-primary remove-genotype"
+                        "X",
+                        type="button",
+                        css_class="btn btn-secondary remove-genotype",
                     ),
                     css_class="col-md-1 mb-3 d-flex align-items-end",
                 ),

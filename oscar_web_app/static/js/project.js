@@ -45,25 +45,10 @@ function removeGenotype(e) {
     const button = e.target.closest('.remove-genotype');
     if (!button) return;
 
-    const row = button.closest(".form-row")
+    const row = button.closest(".row")
     const deleteCheckbox = row.querySelector("input[name$='-DELETE']")
     if (deleteCheckbox) {
         deleteCheckbox.checked = true;
     }
     row.style.display = "none";
-
-    // const nForms = Number(totalForms.value);
-
-    // row.remove()
-    // totalForms.value = nForms - 1;
-
-    // // Renumber all remaining forms, so they are consecutive
-    // const rows = genotypeForms.querySelector(".form-row")
-    // rows.forEach((row, index) => {
-    //     row.querySelectorAll("*").forEach(el => {
-    //     for (const attr of el.attributes) {
-    //         attr.value = attr.value.replace(/form-\d+-/, `form-${index}-`);
-    //         }
-    //     });
-    // });
 }
