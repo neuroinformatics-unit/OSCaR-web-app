@@ -37,7 +37,7 @@ class LineForm(forms.Form):
 
 
 class GenotypeForm(forms.Form):
-    count = forms.IntegerField()
+    count = forms.IntegerField(min_value=1, initial=1)
 
     def __init__(self, mutation_names=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
