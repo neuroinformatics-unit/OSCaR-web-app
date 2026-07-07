@@ -1246,7 +1246,7 @@ wheels = [
 
 [[package]]
 name = "oscar-colony"
-version = "0.0.4"
+version = "0.0.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
@@ -1254,9 +1254,9 @@ dependencies = [
     { name = "requests" },
     { name = "scipy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/76/10/2d60d451abc1d5a3d458084419dd9459a4ec23d104ec9e3403153a68df04/oscar_colony-0.0.4.tar.gz", hash = "sha256:9473f6dee2678a6cc2e607c9c4868669509dc84e105996b6752af13d39d75ef3", size = 20466, upload-time = "2026-06-17T16:27:04.958Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/41/0d/e84c14ee5c67aac37bd46ba2a7e8d49def61f3ebe3a50aa340b4743667e4/oscar_colony-0.0.5.tar.gz", hash = "sha256:267294bb159856bc0e7ee03653b5e89d36ae160cd60cc4ffee1fc6bd702cf90c", size = 21797, upload-time = "2026-07-07T15:37:26.42Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fa/00/f46ac59ada7af96617f1e9fb87f1a95cea001e173dd4635ff039276075a8/oscar_colony-0.0.4-py3-none-any.whl", hash = "sha256:704182112cfb0b8e148b350a85b8638328e0eb81d206cc178dd4a6cc5622bd3d", size = 20933, upload-time = "2026-06-17T16:27:03.863Z" },
+    { url = "https://files.pythonhosted.org/packages/ac/76/45126c694696edf5b8efe2ee127bd7d4e2b0164b104f3df76a281ef4e2a1/oscar_colony-0.0.5-py3-none-any.whl", hash = "sha256:3fde66dc45fb0d74f7b9cb0d5c3331622eaa73af858ab7a64d32aa16d475dcb6", size = 22705, upload-time = "2026-07-07T15:37:25.497Z" },
 ]
 
 [[package]]
@@ -1330,7 +1330,7 @@ requires-dist = [
     { name = "flower", specifier = "==2.0.1" },
     { name = "gunicorn", specifier = "==26.0.0" },
     { name = "hiredis", specifier = "==3.4.0" },
-    { name = "oscar-colony", specifier = "==0.0.4" },
+    { name = "oscar-colony", specifier = "==0.0.5" },
     { name = "pillow", specifier = "==12.2.0" },
     { name = "psycopg", extras = ["binary"], marker = "sys_platform == 'win32'", specifier = "==3.3.4" },
     { name = "psycopg", extras = ["c"], marker = "sys_platform != 'win32'", specifier = "==3.3.4" },
