@@ -1,6 +1,7 @@
 from crispy_forms.bootstrap import StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Column
+from crispy_forms.layout import Div
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Row
 from django import forms
@@ -22,7 +23,7 @@ def _fetch_line_choices():
 
 class LineForm(forms.Form):
     line = forms.ChoiceField(
-        label="Line",
+        label="Line name",
         choices=_fetch_line_choices,
         required=True,
     )
@@ -32,6 +33,7 @@ class LineForm(forms.Form):
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.disable_csrf = True
+        self.helper.layout = Layout(Div("line", css_class="border-bottom mb-3"))
 
 
 class GenotypeForm(forms.Form):
@@ -62,8 +64,9 @@ class GenotypeForm(forms.Form):
                     StrictButton(
                         "X", type="button", css_class="btn btn-primary remove-genotype"
                     ),
-                    css_class="mb-3 d-flex align-items-end",
+                    css_class="col-md-1 mb-3 d-flex align-items-end",
                 ),
+                css_class="bg-light rounded-4 p-1 my-2",
             )
         )
 

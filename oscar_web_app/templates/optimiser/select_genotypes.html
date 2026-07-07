@@ -4,27 +4,23 @@
 
 {% block title %}Select genotypes{% endblock title %}
 {% block content %}
-  <h1>Select line and genotypes</h1>
+  <h1 class="my-4">Select line and genotypes</h1>
   <form action="" method="post">
     {% csrf_token %}
     {% crispy line_form %}
-    {{ formset.management_form }}
-    <div id="genotype-forms">
-      {% for form in formset %}
-        <div class="form-row">
-          {% crispy form %}
-          {% comment %} <button type="button" class="remove-genotype">X</button> {% endcomment %}
-        </div>
-      {% endfor %}
-    </div>
-    <button type="button" id="add-genotype">Add Genotype</button>
-    <input type="submit" value="Calculate optimal breeding schemes" />
-    <!-- Hidden empty form, used via js for adding new rows -->
-    <template id="empty-form">
-      <div class="form-row">
-        {% crispy formset.empty_form %}
-        {% comment %} <button type="button" class="remove-genotype">X</button> {% endcomment %}
+    {% if formset %}
+      {{ formset.management_form }}
+      <div id="genotype-forms">
+        {% for form in formset %}
+          <div class="form-row">{% crispy form %}</div>
+        {% endfor %}
       </div>
-    </template>
+      <button type="button" id="add-genotype">Add Genotype</button>
+      <input type="submit" value="Calculate optimal breeding schemes" />
+      <!-- Hidden empty form, used via js for adding new rows -->
+      <template id="empty-form">
+        <div class="form-row">{% crispy formset.empty_form %}</div>
+      </template>
+    {% endif %}
   </form>
 {% endblock content %}

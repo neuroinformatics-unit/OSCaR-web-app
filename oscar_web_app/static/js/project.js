@@ -6,9 +6,14 @@ const genotypeForms = document.querySelector("#genotype-forms");
 const totalForms = document.querySelector("#id_form-TOTAL_FORMS");
 const emptyTemplate = document.querySelector("#empty-form")
 
-addButton.addEventListener("click", addGenotype);
-genotypeForms.addEventListener("click", removeGenotype);
 lineDropdown.addEventListener("change", submitForm)
+if (addButton) {
+    addButton.addEventListener("click", addGenotype);
+}
+if (genotypeForms) {
+    genotypeForms.addEventListener("click", removeGenotype);
+}
+
 
 function submitForm(e) {
     let dropdown = e.target;
