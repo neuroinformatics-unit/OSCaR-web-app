@@ -104,9 +104,8 @@ class BaseGenotypeFormset(BaseFormSet):
             if self.can_delete and self._should_delete_form(form):
                 continue
 
-            genotype = []
-            [
-                genotype.append(form.cleaned_data.get(mutation_field))
+            genotype = [
+                form.cleaned_data.get(mutation_field)
                 for mutation_field in mutation_fields
             ]
 
