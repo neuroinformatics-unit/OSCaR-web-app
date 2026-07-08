@@ -5,6 +5,7 @@ from crispy_forms.layout import Div
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Row
 from django import forms
+from django.core.exceptions import ValidationError
 from django.forms import BaseFormSet
 from django.forms import formset_factory
 from oscar_colony.breeding_scheme import Genotype
@@ -39,19 +40,21 @@ class LineForm(forms.Form):
 class GenotypeForm(forms.Form):
     count = forms.IntegerField(min_value=1, initial=1)
 
-    def __init__(self, mutation_names=None, *args, **kwargs):
+    def __init__(self, *args, mutation_names=None, **kwargs):
         super().__init__(*args, **kwargs)
 
+        if mutation_names is None:
+            mutation_names = []
+
         # mutations is a kwarg
-        if mutation_names:
-            for mutation_name in mutation_names:
-                self.fields[mutation_name] = forms.ChoiceField(
-                    choices=(
-                        (Genotype.WT, "WT"),
-                        (Genotype.HET, "HET"),
-                        (Genotype.HOM, "HOM"),
-                    )
+        for mutation_name in mutation_names:
+            self.fields[mutation_name] = forms.ChoiceField(
+                choices=(
+                    (Genotype.WT, "WT"),
+                    (Genotype.HET, "HET"),
+                    (Genotype.HOM, "HOM"),
                 )
+            )
 
         self.helper = FormHelper()
         self.helper.form_tag = False
@@ -74,13 +77,50 @@ class GenotypeForm(forms.Form):
 
 
 # A formset where the can_delete checkbox is hidden by default
-class HiddenDeleteFormSet(BaseFormSet):
+class BaseGenotypeFormset(BaseFormSet):
     def add_fields(self, form, index):
+        """Keep the delete field hidden by default"""
+
         super().add_fields(form, index)
         if "DELETE" in form.fields:
             form.fields["DELETE"].widget = forms.HiddenInput()
 
+    def clean(self):
+        """Checks all provided genotypes are unique"""
+
+        # Check individual genotype forms are valid
+        if any(self.errors):
+            return
+
+        genotypes = set()
+        mutation_fields = [
+            field_name
+            for field_name in self.forms[0].cleaned_data
+            if field_name != "Count"
+        ]
+
+        for form in self.forms:
+            # ignore forms marked for deletion
+            if self.can_delete and self._should_delete_form(form):
+                continue
+
+            genotype = []
+            [
+                genotype.append(form.cleaned_data.get(mutation_field))
+                for mutation_field in mutation_fields
+            ]
+
+            if genotype in genotypes:
+                msg = "All genotypes must be unique"
+                raise ValidationError(msg)
+            genotypes.add(genotype)
+
 
 GenotypeFormSet = formset_factory(
-    GenotypeForm, formset=HiddenDeleteFormSet, extra=1, can_delete=True
+    GenotypeForm,
+    formset=BaseGenotypeFormset,
+    extra=0,
+    can_delete=True,
+    min_num=1,
+    validate_min=True,
 )
