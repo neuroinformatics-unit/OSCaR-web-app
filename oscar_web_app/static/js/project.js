@@ -37,6 +37,6 @@ function removeGenotype(e) {
     const deleteCheckbox = row.querySelector("input[name$='-DELETE']")
     if (deleteCheckbox) {
         deleteCheckbox.checked = true;
+        row.classList.add("deleted");
     }
-    row.style.display = "none";
 }

@@ -22,16 +22,21 @@ def select_line(request):
 def select_genotypes(request, line_id):
 
     mutations = get_pyrat_line_mutations(line_id)
+    error_messages = {"too_few_forms": "Please provide at least one genotype"}
 
     if request.method == "POST":
         formset = GenotypeFormSet(
-            request.POST, form_kwargs={"mutation_names": mutations}
+            request.POST,
+            form_kwargs={"mutation_names": mutations},
+            error_messages=error_messages,
         )
         if formset.is_valid():
             return redirect("optimiser:calculate_schemes", line_id=line_id)
 
     else:
-        formset = GenotypeFormSet(form_kwargs={"mutation_names": mutations})
+        formset = GenotypeFormSet(
+            form_kwargs={"mutation_names": mutations}, error_messages=error_messages
+        )
 
     return render(request, "optimiser/select_genotypes.html", {"formset": formset})
 

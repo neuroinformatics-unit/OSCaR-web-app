@@ -90,10 +90,9 @@ class GenotypeForm(forms.Form):
         )
 
 
-# A formset where the can_delete checkbox is hidden by default
 class BaseGenotypeFormset(BaseFormSet):
     def clean(self):
-        """Checks all provided genotypes are unique"""
+        """On form submission, check that all provided genotypes are unique"""
 
         # Check individual genotype forms are valid
         if any(self.errors):
@@ -103,7 +102,7 @@ class BaseGenotypeFormset(BaseFormSet):
         mutation_fields = [
             field_name
             for field_name in self.forms[0].cleaned_data
-            if field_name != "Count"
+            if field_name not in ["count", "DELETE"]
         ]
 
         for form in self.forms:
