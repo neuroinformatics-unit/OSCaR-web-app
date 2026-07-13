@@ -20,7 +20,7 @@ services:
     env_file:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
-      - ./.envs/.local/.pyrat
+      - ./.envs/.production/.colony
     command: /start
 
   postgres:

@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from django.shortcuts import render
-from oscar_colony.colony_management.pyrat.api import get_pyrat_line_mutations
 
+from .colony_management import ColonyManagement
 from .forms import GenotypeFormSet
 from .forms import LineForm
 
@@ -21,7 +21,7 @@ def select_line(request):
 
 def select_genotypes(request, line_id):
 
-    mutations = get_pyrat_line_mutations(line_id)
+    mutations = ColonyManagement().get_line_mutations(line_id)
     error_messages = {"too_few_forms": "Please provide at least one genotype"}
 
     if request.method == "POST":

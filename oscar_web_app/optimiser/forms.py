@@ -11,7 +11,8 @@ from django.core.exceptions import ValidationError
 from django.forms import BaseFormSet
 from django.forms import formset_factory
 from oscar_colony.breeding_scheme import Genotype
-from oscar_colony.colony_management.pyrat.api import get_pyrat_lines
+
+from .colony_management import ColonyManagement
 
 
 def _fetch_line_choices():
@@ -20,7 +21,7 @@ def _fetch_line_choices():
     # Start with an empty default choice
     lines = [("", "--------")]
 
-    for line_df in get_pyrat_lines():
+    for line_df in ColonyManagement().get_lines():
         lines.extend([(row.id, row.name) for row in line_df.itertuples(index=False)])
 
     return lines
