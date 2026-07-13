@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import redirect
 from django.shortcuts import render
 
@@ -22,6 +23,10 @@ def select_line(request):
 def select_genotypes(request, line_id):
 
     mutations = ColonyManagement().get_line_mutations(line_id)
+    if len(mutations) == 0:
+        msg = "No mutations found for chosen line"
+        raise Http404(msg)
+
     error_messages = {"too_few_forms": "Please provide at least one genotype"}
 
     if request.method == "POST":

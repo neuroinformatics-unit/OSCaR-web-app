@@ -22,7 +22,10 @@ def _fetch_line_choices():
     lines = [("", "--------")]
 
     for line_df in ColonyManagement().get_lines():
-        lines.extend([(row.id, row.name) for row in line_df.itertuples(index=False)])
+        if not line_df.empty:
+            lines.extend(
+                [(row.id, row.name) for row in line_df.itertuples(index=False)]
+            )
 
     return lines
 
