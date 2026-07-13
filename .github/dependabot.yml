@@ -6,9 +6,8 @@ updates:
   # Update GitHub actions in workflows
   - package-ecosystem: 'github-actions'
     directory: '/'
-    # Every weekday
     schedule:
-      interval: 'daily'
+      interval: 'monthly'
     groups:
       github-actions:
         patterns:
@@ -21,9 +20,8 @@ updates:
       - 'compose/local/django/'
       - 'compose/local/docs/'
       - 'compose/production/django/'
-    # Every weekday
     schedule:
-      interval: 'daily'
+      interval: 'monthly'
     # Ignore minor version updates (3.10 -> 3.11) but update patch versions
     ignore:
       - dependency-name: '*'
@@ -43,25 +41,22 @@ updates:
       - 'compose/production/aws/'
       - 'compose/production/postgres/'
       - 'compose/production/traefik/'
-    # Every weekday
     schedule:
-      interval: 'daily'
+      interval: 'monthly'
 
   # Enable version updates for Docker Compose files
   - package-ecosystem: 'docker-compose'
     directories:
       - '/'
-    # Every weekday
     schedule:
-      interval: 'daily'
+      interval: 'monthly'
 
   # Enable version updates for Python/uv
   - package-ecosystem: 'uv'
     # Look for a `pyproject.toml` in the `root` directory
     directory: '/'
-    # Every weekday
     schedule:
-      interval: 'daily'
+      interval: 'monthly'
     groups:
       python:
         update-types:
