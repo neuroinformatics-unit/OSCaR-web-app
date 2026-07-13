@@ -1,3 +1,4 @@
+from django.shortcuts import redirect
 from django.shortcuts import render
 from oscar_colony.colony_management.pyrat.api import get_pyrat_line_mutations
 
@@ -5,7 +6,20 @@ from .forms import GenotypeFormSet
 from .forms import LineForm
 
 
-def select_genotypes(request):
+def select_line(request):
+    if request.method == "POST":
+        form = LineForm()
+        if form.is_valid():
+            line_id = form.cleaned_data["line"]
+            return redirect("select_genotypes", line_id=line_id)
+
+    else:
+        form = LineForm()
+
+    return render(request, "optimiser/select_line.html", {"form": form})
+
+
+def select_genotypes(request, line_id):
 
     if request.method != "POST":
         line_form = LineForm()

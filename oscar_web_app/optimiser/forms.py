@@ -1,9 +1,11 @@
 from crispy_forms.bootstrap import StrictButton
 from crispy_forms.helper import FormHelper
+from crispy_forms.layout import HTML
 from crispy_forms.layout import Column
 from crispy_forms.layout import Div
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Row
+from crispy_forms.layout import Submit
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import BaseFormSet
@@ -34,9 +36,18 @@ class LineForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_tag = False
-        self.helper.disable_csrf = True
-        self.helper.layout = Layout(Div("line", css_class="border-bottom mb-3"))
+        self.helper.layout = Layout(
+            "line",
+            Div(
+                HTML(
+                    """
+                    <a href="{% url 'home' %}" class="btn btn-secondary px-5">Back</a>
+                    """
+                ),
+                Submit("submit", "Next", css_class="btn btn-primary px-5"),
+                css_class="d-flex justify-content-center gap-2",
+            ),
+        )
 
 
 class GenotypeForm(forms.Form):
