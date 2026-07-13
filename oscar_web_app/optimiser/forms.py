@@ -13,6 +13,8 @@ from oscar_colony.colony_management.pyrat.api import get_pyrat_lines
 
 
 def _fetch_line_choices():
+    """Fetch list of available lines via oscar_colony"""
+
     # Start with an empty default choice
     lines = [("", "--------")]
 
@@ -71,6 +73,7 @@ class GenotypeForm(forms.Form):
                     ),
                     css_class="col-md-1 mb-3 d-flex align-items-end",
                 ),
+                Column("DELETE", css_class="d-none"),  # Hide django's deletion checkbox
                 css_class="bg-light rounded-4 p-1 my-2",
             )
         )
@@ -78,13 +81,6 @@ class GenotypeForm(forms.Form):
 
 # A formset where the can_delete checkbox is hidden by default
 class BaseGenotypeFormset(BaseFormSet):
-    def add_fields(self, form, index):
-        """Keep the delete field hidden by default"""
-
-        super().add_fields(form, index)
-        if "DELETE" in form.fields:
-            form.fields["DELETE"].widget = forms.HiddenInput()
-
     def clean(self):
         """Checks all provided genotypes are unique"""
 
@@ -108,6 +104,7 @@ class BaseGenotypeFormset(BaseFormSet):
                 form.cleaned_data.get(mutation_field)
                 for mutation_field in mutation_fields
             ]
+            genotype = tuple(genotype)
 
             if genotype in genotypes:
                 msg = "All genotypes must be unique"
