@@ -20,7 +20,7 @@ class ColonyManagement:
     """
 
     def __init__(self):
-        colony_env = os.environ.get("COLONY_SOFTWARE")
+        colony_env = os.environ.get("COLONY_SOFTWARE", "DEV")
         if colony_env in ColonySoftware:
             self.colony_software = ColonySoftware[colony_env]
         else:
