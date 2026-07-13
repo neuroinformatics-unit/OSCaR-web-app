@@ -8,10 +8,10 @@ from .forms import LineForm
 
 def select_line(request):
     if request.method == "POST":
-        form = LineForm()
+        form = LineForm(request.POST)
         if form.is_valid():
             line_id = form.cleaned_data["line"]
-            return redirect("select_genotypes", line_id=line_id)
+            return redirect("optimiser:select_genotypes", line_id=line_id)
 
     else:
         form = LineForm()
@@ -21,40 +21,20 @@ def select_line(request):
 
 def select_genotypes(request, line_id):
 
-    if request.method != "POST":
-        line_form = LineForm()
-        return render(
-            request, "optimiser/select_genotypes.html", {"line_form": line_form}
+    mutations = get_pyrat_line_mutations(line_id)
+
+    if request.method == "POST":
+        formset = GenotypeFormSet(
+            request.POST, form_kwargs={"mutation_names": mutations}
         )
+        if formset.is_valid():
+            return redirect("optimiser:calculate_schemes", line_id=line_id)
 
-    # Handle POST requests
-    line_form = LineForm(request.POST)
-    line_id = None
-    if line_form.is_valid():
-        line_id = line_form.cleaned_data["line"]
+    else:
+        formset = GenotypeFormSet(form_kwargs={"mutation_names": mutations})
 
-    # The form was submitted via the optimise schemes button
-    if (request.POST.get("action") == "optimise") and (line_id is not None):
-        mutations = get_pyrat_line_mutations(line_id)
-        genotype_formset = GenotypeFormSet(
-            request.POST, request.FILES, form_kwargs={"mutation_names": mutations}
-        )
+    return render(request, "optimiser/select_genotypes.html", {"formset": formset})
 
-        if genotype_formset.is_valid():
-            return render(
-                request,
-                "optimiser/calculate_genotypes.html",
-                {"formset": genotype_formset},
-            )
 
-    # The form was submitted by changing the dropdown
-    elif line_id is not None:
-        # Fetches mutations from API
-        mutations = get_pyrat_line_mutations(line_id)
-        genotype_formset = GenotypeFormSet(form_kwargs={"mutation_names": mutations})
-
-    return render(
-        request,
-        "optimiser/select_genotypes.html",
-        {"line_form": line_form, "formset": genotype_formset},
-    )
+def calculate_schemes(request, line_id):
+    return render(request, "optimiser/calculate_schemes.html", {"line_id": line_id})
