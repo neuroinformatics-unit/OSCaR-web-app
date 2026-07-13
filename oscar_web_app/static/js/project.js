@@ -11,6 +11,7 @@ if (genotypeForms) {
     genotypeForms.addEventListener("click", removeGenotype);
 }
 
+// Add a new, empty genotype form to the genotypeForms container
 function addGenotype() {
     const nForms = Number(totalForms.value);
     const emptyForm = emptyTemplate.content.cloneNode(true);
@@ -26,7 +27,7 @@ function addGenotype() {
     totalForms.value = nForms + 1;
 }
 
-
+// Mark a genotype row for deletion, and hide it from the user
 function removeGenotype(e) {
 
     // Retrieve the clicked button

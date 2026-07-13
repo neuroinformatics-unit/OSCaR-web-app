@@ -22,6 +22,7 @@ def select_line(request):
 
 def select_genotypes(request, line_id):
 
+    # Fetch mutation names to create custom fields in the Genotype forms
     mutations = ColonyManagement().get_line_mutations(line_id)
     if len(mutations) == 0:
         msg = "No mutations found for chosen line"

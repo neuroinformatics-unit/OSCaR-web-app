@@ -31,6 +31,8 @@ class ColonyManagement:
             raise NotImplementedError(msg)
 
     def get_lines(self):
+        """Get names and ids of available lines"""
+
         if self.colony_software == ColonySoftware.PYRAT:
             lines = get_pyrat_lines()
         else:
@@ -41,6 +43,8 @@ class ColonyManagement:
         return lines
 
     def get_line_mutations(self, line_id):
+        """Get names of mutations for the given line"""
+
         if self.colony_software == ColonySoftware.PYRAT:
             lines = get_pyrat_line_mutations(line_id)
         elif line_id == 1:

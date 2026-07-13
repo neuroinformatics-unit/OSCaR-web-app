@@ -16,7 +16,7 @@ from .colony_management import ColonyManagement
 
 
 def _fetch_line_choices():
-    """Fetch list of available lines via oscar_colony"""
+    """Fetch available line choices to populate dropdown menu"""
 
     # Start with an empty default choice
     lines = [("", "--------")]
@@ -31,6 +31,8 @@ def _fetch_line_choices():
 
 
 class LineForm(forms.Form):
+    """Form to select a specific line"""
+
     line = forms.ChoiceField(
         label="Line name",
         choices=_fetch_line_choices,
@@ -55,6 +57,8 @@ class LineForm(forms.Form):
 
 
 class GenotypeForm(forms.Form):
+    """Form to specify required number of animals of one genotype"""
+
     count = forms.IntegerField(min_value=1, initial=1)
 
     def __init__(self, *args, mutation_names=None, **kwargs):
@@ -95,6 +99,8 @@ class GenotypeForm(forms.Form):
 
 
 class BaseGenotypeFormset(BaseFormSet):
+    """Base class for the formset - allows custom formset validation"""
+
     def clean(self):
         """On form submission, check that all provided genotypes are unique"""
 
