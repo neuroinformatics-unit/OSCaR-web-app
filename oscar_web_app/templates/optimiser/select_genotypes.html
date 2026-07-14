@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}Select genotypes{% endblock title %}
+{% block content %}
+  <h1 class="mt-4 mb-5">Select genotypes</h1>
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    {% comment %} Display any formset errors {% endcomment %}
+    {% if formset.non_form_errors %}
+      <div class="alert alert-danger d-flex justify-content-center align-items-center">{{ formset.non_form_errors }}</div>
+    {% endif %}
+    {% comment %} Display the formset, hiding rows if the form.DELETE checkbox
+    has been ticked {% endcomment %}
+    <div id="genotype-forms">
+      {% for form in formset %}
+        <div class="{% if form.DELETE.value %}deleted{% endif %}">{% crispy form %}</div>
+      {% endfor %}
+    </div>
+    {% comment %} Buttons to interact with the formset {% endcomment %}
+    <button type="button" id="add-genotype" class="btn btn-secondary d-block">Add Genotype</button>
+    <div class="d-flex justify-content-center gap-2">
+      <a href="{% url 'optimiser:select_line' %}"
+         class="btn btn-secondary px-5">Back</a>
+      <input type="submit" value="Next" class="btn btn-primary px-5" />
+    </div>
+    {% comment %} Hidden empty form, used via js for adding new rows {% endcomment %}
+    <template id="empty-form">
+      {% crispy formset.empty_form %}
+    </template>
+  </form>
+{% endblock content %}

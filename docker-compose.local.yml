@@ -19,8 +19,11 @@ services:
     env_file:
       - ./.envs/.local/.django
       - ./.envs/.local/.postgres
+      - path: ./.envs/.local/.colony
+        required: false
     ports:
       - '8000:8000'
+      - "5678:5678"  # port for debugpy
     command: /start
 
   postgres:
