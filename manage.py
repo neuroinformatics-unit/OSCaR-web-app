@@ -10,6 +10,13 @@ def main():
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 
+    if os.environ.get("START_WITH_DEBUGPY", "no") == "yes":
+        if os.environ.get("RUN_MAIN") or os.environ.get("WERKZEUG_RUN_MAIN"):
+            import debugpy  # noqa: PLC0415
+
+            debugpy.listen(("localhost", 5678))
+            debugpy.wait_for_client()
+
     try:
         from django.core.management import execute_from_command_line  # noqa: PLC0415
     except ImportError as exc:
