@@ -43,7 +43,7 @@ class LineForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
-            "line",
+            Div(Column("line", css_class="col-md-7 mx-auto")),
             Div(
                 HTML(
                     """
@@ -83,7 +83,7 @@ class GenotypeForm(forms.Form):
         self.helper.layout = Layout(
             Row(
                 *(Column(name) for name in mutation_names),
-                Column("count"),
+                Column("count", css_class="col-md-2"),
                 Column(
                     StrictButton(
                         "X",
