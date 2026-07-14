@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}Select line{% endblock title %}
+{% block content %}
+  <h1 class="mt-4 mb-5">Select a line</h1>
+  {% crispy form %}
+{% endblock content %}

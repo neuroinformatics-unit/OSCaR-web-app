@@ -29,16 +29,19 @@ dependencies = [
   "flower==2.0.1",
   "gunicorn==26.0.0",
   "hiredis==3.4.0",
+  "oscar-colony==0.0.5",
   "pillow==12.2.0",
-  "psycopg[c]==3.3.4",
+  "psycopg[binary]==3.3.4; platform_system=='Windows'",
+  "psycopg[c]==3.3.4; platform_system!='Windows'",
   "python-slugify==8.0.4",
   "redis==8.0.0",
-  "whitenoise==6.12.0",
+  "whitenoise==6.12.0"
 ]
 
 [dependency-groups]
 dev = [
   "coverage==7.14.1",
+  "debugpy==1.8.21",
   "django-coverage-plugin==3.2.2",
   "django-debug-toolbar==6.3.0",
   "django-extensions==4.1",
@@ -48,7 +51,6 @@ dev = [
   "ipdb==0.13.13",
   "mypy==2.1.0",
   "pre-commit==4.6.0",
-  "psycopg[c]==3.3.4",
   "pytest==9.1.0",
   "pytest-django==4.12.0",
   "pytest-sugar==1.1.1",
@@ -56,7 +58,7 @@ dev = [
   "sphinx==9.1.0",
   "sphinx-autobuild==2025.8.25",
   "watchfiles==1.2.0",
-  "werkzeug[watchdog]==3.1.8",
+  "werkzeug[watchdog]==3.1.8"
 ]
 
 # ==== djLint ====
@@ -132,6 +134,7 @@ lint.select = [
   "YTT",
 ]
 lint.ignore = [
+  "COM812", # ruff recommends disabling this when using the formatter
   "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
   "S101",   # Use of assert detected https://docs.astral.sh/ruff/rules/assert/
   "SIM102", # sometimes it's better to nest

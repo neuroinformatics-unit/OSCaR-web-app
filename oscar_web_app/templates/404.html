@@ -2,10 +2,10 @@
 
 {% block title %}Page not found{% endblock title %}
 {% block content %}
-  <h1>Page not found</h1>
+  <h1 class="mt-4 mb-5">Page not found</h1>
   <p>
     {% if exception %}
-      {{ exception }}
+      <div class="alert alert-danger d-flex justify-content-center align-items-center">{{ exception }}</div>
     {% else %}
       This is not the page you were looking for.
     {% endif %}

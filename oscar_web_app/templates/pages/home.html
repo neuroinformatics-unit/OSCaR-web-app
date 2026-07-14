@@ -1,1 +1,8 @@
 {% extends "base.html" %}
+
+{% block title %}Home{% endblock title %}
+{% block content %}
+  <h1>Welcome to OSCaR</h1>
+  <p>OSCaR is a...</p>
+  <a class="btn btn-primary" href="{% url 'optimiser:select_line' %}">Start</a>
+{% endblock content %}

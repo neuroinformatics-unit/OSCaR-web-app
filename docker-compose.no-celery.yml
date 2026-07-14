@@ -1,0 +1,13 @@
+services:
+
+  django:
+    depends_on: !override
+      - postgres
+
+  redis: !reset null
+
+  celeryworker: !reset null
+
+  celerybeat: !reset null
+
+  flower: !reset null
