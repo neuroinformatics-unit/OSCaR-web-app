@@ -19,6 +19,7 @@ services:
     env_file:
       - ./.envs/.local/.django
       - ./.envs/.local/.postgres
+      - ./.envs/.local/.entra
       - path: ./.envs/.local/.colony
         required: false
     ports:

@@ -18,6 +18,7 @@ urlpatterns = [
     # User management
     path("users/", include("oscar_web_app.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
+    path("oauth2/", include("django_entra_auth.urls")),
     # Your stuff: custom urls includes go here
     path("optimiser/", include("oscar_web_app.optimiser.urls", namespace="optimiser")),
     # Media files

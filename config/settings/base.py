@@ -77,6 +77,7 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.mfa",
     "allauth.socialaccount",
+    "django_entra_auth",
     "django_celery_beat",
 ]
 
@@ -97,14 +98,31 @@ MIGRATION_MODULES = {"sites": "oscar_web_app.contrib.sites.migrations"}
 # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
+    "django_entra_auth.backend.AdfsAuthCodeBackend",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
-LOGIN_REDIRECT_URL = "users:redirect"
+LOGIN_REDIRECT_URL = "/"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
-LOGIN_URL = "account_login"
+LOGIN_URL = "django_entra_auth:login"
+
+ENTRA_AUTH = {
+    "CLIENT_ID": env("CLIENT_ID"),
+    "CLIENT_SECRET": env("CLIENT_SECRET"),
+    "TENANT_ID": env("TENANT_ID"),
+    "AUDIENCE": env("AUDIENCE"),
+    "RELYING_PARTY_ID": env("CLIENT_ID"),
+    # # Map Entra ID claims to Django user fields
+    # "CLAIM_MAPPING": {
+    #     "first_name": "given_name",
+    #     "last_name": "family_name",
+    #     "email": "upn"
+    # },
+    # # Optional: Enable group synchronization
+    # "GROUPS_CLAIM": "groups",
+    # "MIRROR_GROUPS": True,
+}
 
 # PASSWORDS
 # ------------------------------------------------------------------------------
@@ -137,6 +155,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Forces login for all views unless specified in LOGIN_EXEMPT_URLS
+    "django_entra_auth.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
