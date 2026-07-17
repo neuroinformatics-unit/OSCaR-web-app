@@ -1,6 +1,7 @@
 from django.http import Http404
 from django.shortcuts import redirect
 from django.shortcuts import render
+from oscar_colony.historical_stats import LineStatistics
 
 from .colony_management import ColonyManagement
 from .forms import GenotypeFormSet
@@ -11,7 +12,9 @@ def select_line(request):
     if request.method == "POST":
         form = LineForm(request.POST)
         if form.is_valid():
-            line_id = form.cleaned_data["line"]
+            line_id = int(form.cleaned_data["line"])
+            line_name = dict(form.fields["line"].choices)[line_id]
+            request.session[line_id] = line_name
             return redirect("optimiser:select_genotypes", line_id=line_id)
 
     else:
@@ -37,7 +40,15 @@ def select_genotypes(request, line_id):
             error_messages=error_messages,
         )
         if formset.is_valid():
-            return redirect("optimiser:calculate_schemes", line_id=line_id)
+            # run calculation
+            line_name = request.session.get(str(line_id))
+            if line_name is None:
+                # make request
+                pass
+
+            calculate_schemes_from_formset(formset, line_name)
+
+            return render(request, "optimiser/result.html", {})
 
     else:
         formset = GenotypeFormSet(
@@ -47,5 +58,12 @@ def select_genotypes(request, line_id):
     return render(request, "optimiser/select_genotypes.html", {"formset": formset})
 
 
-def calculate_schemes(request, line_id):
-    return render(request, "optimiser/calculate_schemes.html", {"line_id": line_id})
+def calculate_schemes_from_formset(formset, line_name):
+
+    required_genotypes = [form.cleaned_data for form in formset]
+
+    colony_management = ColonyManagement()
+    line_stats = LineStatistics(
+        line_name=line_name, mutations=["CAG tdTom", "Gad2-cre"]
+    )
+    colony_management.optimise_schemes(line_stats, required_genotypes)
