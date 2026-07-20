@@ -329,12 +329,6 @@ SOCIALACCOUNT_PROVIDERS = {
                 "secret": env("CLIENT_SECRET"),
                 "settings": {
                     "tenant": "organizations",
-                    # Optional: override URLs (use base URLs without path)
-                    "login_url": "https://login.microsoftonline.com",
-                    "graph_url": "https://graph.microsoft.com",
-                    # "auth_params": {
-                    #   "prompt": "login",
-                    # }
                 },
             }
         ]
