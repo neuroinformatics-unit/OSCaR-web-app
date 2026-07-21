@@ -46,9 +46,15 @@ def select_genotypes(request, line_id):
                 # make request
                 pass
 
-            calculate_schemes_from_formset(formset, line_name)
+            breeding_schemes, surplus = calculate_schemes_from_formset(
+                formset, line_name
+            )
 
-            return render(request, "optimiser/result.html", {})
+            return render(
+                request,
+                "optimiser/result.html",
+                {"schemes": breeding_schemes, "surplus": surplus},
+            )
 
     else:
         formset = GenotypeFormSet(
@@ -64,6 +70,21 @@ def calculate_schemes_from_formset(formset, line_name):
 
     colony_management = ColonyManagement()
     line_stats = LineStatistics(
-        line_name=line_name, mutations=["CAG tdTom", "Gad2-cre"]
+        line_name=line_name,
+        mutations=["CAG tdTom", "Gad2-cre"],
+        n_mutations=2,
+        total_n_offspring=20,
+        total_n_genotyped_offspring=20,
+        total_n_successful_matings=10,
+        average_litter_size=6,
+        stats_per_breeding_scheme={},
     )
-    colony_management.optimise_schemes(line_stats, required_genotypes)
+    breeding_schemes, surplus = colony_management.optimise_schemes(
+        line_stats, required_genotypes
+    )
+
+    breeding_schemes = breeding_schemes.to_html(
+        classes=["table", "table-striped"], index=False, justify="unset"
+    )
+
+    return breeding_schemes, surplus

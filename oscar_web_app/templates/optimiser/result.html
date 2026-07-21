@@ -2,5 +2,8 @@
 
 {% block title %}Calculate schemes{% endblock title %}
 {% block content %}
-  <h1 class="my-4">Starting optimisation calculation...</h1>
+  <h1 class="my-4">Optimisation results</h1>
+  {% if schemes %}
+    {{ schemes | safe }}
+  {% endif %}
 {% endblock content %}

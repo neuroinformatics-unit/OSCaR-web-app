@@ -93,6 +93,15 @@ class ColonyManagement:
 
             required_n_per_genotype[tuple(genotype)] = genotype_data["count"]
 
-        calculate_optimal_scheme(
+        breeding_schemes, surplus = calculate_optimal_scheme(
             required_n_per_genotype, line_stats=line_stats, default_litter_size=6
         )
+
+        # Convert breeding schemes into a table for easier viewing
+        breeding_schemes = pd.DataFrame(
+            breeding_schemes.items(),
+            columns=("Breeding scheme", "Number of matings"),
+            dtype=str,
+        )
+
+        return breeding_schemes, surplus
