@@ -3,7 +3,21 @@
 {% block title %}Calculate schemes{% endblock title %}
 {% block content %}
   <h1 class="my-4">Optimisation results</h1>
-  {% if schemes %}
-    {{ schemes | safe }}
+  <h2 class="mb-3">Line name</h2>
+  <p>{{ line_stats.line_name }}</p>
+  <h2 class="mb-3">Mutations</h2>
+  <p>{{ line_stats.mutations | join:", " }}</p>
+  {% if scheme_table %}
+    <h2 class="mb-3">Optimal schemes</h2>
+    <div class="row">
+      <div class="col-md-6">{{ scheme_table | safe }}</div>
+      <div class="col-md-4">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">Expected total: {{ total_n }}</li>
+          <li class="list-group-item">Expected surplus: {{ total_surplus }}</li>
+        </ul>
+      </div>
+    </div>
+    {{ surplus_genotype_table | safe }}
   {% endif %}
 {% endblock content %}

@@ -1,7 +1,6 @@
 from django.http import Http404
 from django.shortcuts import redirect
 from django.shortcuts import render
-from oscar_colony.historical_stats import LineStatistics
 
 from .colony_management import ColonyManagement
 from .forms import GenotypeFormSet
@@ -46,14 +45,16 @@ def select_genotypes(request, line_id):
                 # make request
                 pass
 
-            breeding_schemes, surplus = calculate_schemes_from_formset(
-                formset, line_name
-            )
+            line_stats = ColonyManagement().get_line_stats(line_name)
+            scheme_context = calculate_schemes_from_formset(formset, line_stats)
+
+            context = {"line_stats": line_stats}
+            context = context | scheme_context
 
             return render(
                 request,
                 "optimiser/result.html",
-                {"schemes": breeding_schemes, "surplus": surplus},
+                context,
             )
 
     else:
@@ -64,27 +65,26 @@ def select_genotypes(request, line_id):
     return render(request, "optimiser/select_genotypes.html", {"formset": formset})
 
 
-def calculate_schemes_from_formset(formset, line_name):
+def calculate_schemes_from_formset(formset, line_stats):
 
     required_genotypes = [form.cleaned_data for form in formset]
 
     colony_management = ColonyManagement()
-    line_stats = LineStatistics(
-        line_name=line_name,
-        mutations=["CAG tdTom", "Gad2-cre"],
-        n_mutations=2,
-        total_n_offspring=20,
-        total_n_genotyped_offspring=20,
-        total_n_successful_matings=10,
-        average_litter_size=6,
-        stats_per_breeding_scheme={},
-    )
-    breeding_schemes, surplus = colony_management.optimise_schemes(
+    scheme_table, surplus = colony_management.optimise_schemes(
         line_stats, required_genotypes
     )
-
-    breeding_schemes = breeding_schemes.to_html(
+    scheme_table = scheme_table.to_html(
         classes=["table", "table-striped"], index=False, justify="unset"
     )
 
-    return breeding_schemes, surplus
+    surplus_genotype_table = surplus.create_genotype_df()
+    surplus_genotype_table = surplus_genotype_table.to_html(
+        classes=["table", "table-striped"], index=False, justify="unset"
+    )
+
+    return {
+        "scheme_table": scheme_table,
+        "total_n": surplus.total_n,
+        "total_surplus": surplus.total_n_surplus,
+        "surplus_genotype_table": surplus_genotype_table,
+    }
