@@ -3,11 +3,21 @@
 {% block title %}Calculate schemes{% endblock title %}
 {% block content %}
   <h1 class="my-4">Optimisation results</h1>
-  <h2 class="mb-3">Line name</h2>
-  <p>{{ line_stats.line_name }}</p>
-  <h2 class="mb-3">Mutations</h2>
-  <p>{{ line_stats.mutations | join:", " }}</p>
-  <div class="accordion">
+  <div class="row justify-content-start gap-3 mb-4">
+    <div class="col-auto card">
+      <div class="card-body">
+        <h2 class="card-title">Line name</h2>
+        <p class="card-text">{{ line_stats.line_name }}</p>
+      </div>
+    </div>
+    <div class="col-auto card">
+      <div class="card-body">
+        <h2 class="card-title">Mutations</h2>
+        <p class="card-text">{{ line_stats.mutations | join:", " }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="accordion accordion-flush">
     <div class="accordion-item">
       <h2 class="accordion-header" id="optimal-schemes-heading">
         <button class="accordion-button"
@@ -20,8 +30,8 @@
       <div id="optimal-schemes-collapse"
            class="accordion-collapse collapse show"
            aria-labelledby="optimal-schemes-heading">
-        <div class="accordion-body row">
-          <div class="col-md-6">{{ scheme_table | safe }}</div>
+        <div class="accordion-body row justify-content-center">
+          <div class="col-auto">{{ scheme_table | safe }}</div>
           <div class="col-md-4">
             <ul class="list-group list-group-flush">
               <li class="list-group-item">Expected total: {{ total_n }}</li>
@@ -43,7 +53,9 @@
       <div id="genotype-summary-collapse"
            class="accordion-collapse collapse"
            aria-labelledby="genotype-summary-heading">
-        <div class="accordion-body">{{ surplus_genotype_table | safe }}</div>
+        <div class="accordion-body row justify-content-center">
+          <div class="col-md-8">{{ surplus_genotype_table | safe }}</div>
+        </div>
       </div>
     </div>
   </div>
