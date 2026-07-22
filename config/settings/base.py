@@ -328,14 +328,14 @@ SOCIALACCOUNT_PROVIDERS = {
             {
                 "provider_id": "microsoft",
                 "name": "Microsoft",
-                "client_id": env("CLIENT_ID"),
-                "secret": env("CLIENT_SECRET"),
+                "client_id": env("CLIENT_ID", default=""),
+                "secret": env("CLIENT_SECRET", default=""),
                 "settings": {
                     "fetch_userinfo": True,
                     "oauth_pkce_enabled": True,
                     "server_url": (
                         f"https://login.microsoftonline.com/"
-                        f"{env('AZURE_TENANT_ID')}/v2.0"
+                        f"{env('AZURE_TENANT_ID', default='')}/v2.0"
                     ),
                     "token_auth_method": "client_secret_basic",
                     # The field to be used as the account ID.
