@@ -1,6 +1,8 @@
+import pandas as pd
 from django.http import Http404
 from django.shortcuts import redirect
 from django.shortcuts import render
+from oscar_colony.breeding_scheme import Genotype
 
 from .colony_management import ColonyManagement
 from .forms import GenotypeFormSet
@@ -45,11 +47,12 @@ def select_genotypes(request, line_id):
                 # make request
                 pass
 
-            line_stats = ColonyManagement().get_line_stats(line_name)
-            scheme_context = calculate_schemes_from_formset(formset, line_stats)
+            stats_context = fetch_line_stats_context(line_name)
+            scheme_context = calculate_schemes_from_formset(
+                formset, stats_context["line_stats"]
+            )
 
-            context = {"line_stats": line_stats}
-            context = context | scheme_context
+            context = stats_context | scheme_context
 
             return render(
                 request,
@@ -63,6 +66,29 @@ def select_genotypes(request, line_id):
         )
 
     return render(request, "optimiser/select_genotypes.html", {"formset": formset})
+
+
+def fetch_line_stats_context(line_name):
+
+    line_stats = ColonyManagement().get_line_stats(line_name)
+    n_per_genotype = line_stats.total_n_offspring_per_genotype
+
+    n_per_genotype_df = pd.DataFrame(
+        n_per_genotype.items(),
+        columns=("Genotype", "N offspring"),
+    )
+    n_per_genotype_df["Genotype"] = n_per_genotype_df["Genotype"].apply(
+        Genotype.to_string
+    )
+
+    return {
+        "stats_total_n": line_stats.total_n_offspring,
+        "stats_genotyped_n": line_stats.total_n_genotyped_offspring,
+        "stats_matings_n": line_stats.total_n_successful_matings,
+        "stats_litter_size": round(line_stats.average_litter_size, 2),
+        "line_stats": line_stats,
+        "stats_genotype_table": n_per_genotype_df,
+    }
 
 
 def calculate_schemes_from_formset(formset, line_stats):
@@ -87,9 +113,12 @@ def calculate_schemes_from_formset(formset, line_stats):
         classes=["table", "table-striped"], index=False, justify="unset"
     )
 
+    decimal_places = 2
+
     return {
         "scheme_table": scheme_table,
-        "total_n": surplus.total_n,
-        "total_surplus": surplus.total_n_surplus,
+        "total_n": round(surplus.total_n, decimal_places),
+        "total_surplus": round(surplus.total_n_surplus, decimal_places),
+        "required_n": round(surplus.total_n - surplus.total_n_surplus, decimal_places),
         "surplus_genotype_table": surplus_genotype_table,
     }

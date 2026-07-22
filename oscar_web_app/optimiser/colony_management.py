@@ -7,7 +7,6 @@ from oscar_colony.colony_management.pyrat.api import get_pyrat_data
 from oscar_colony.colony_management.pyrat.api import get_pyrat_line_mutations
 from oscar_colony.colony_management.pyrat.api import get_pyrat_lines
 from oscar_colony.colony_management.pyrat.standardise import standardise_pyrat_csv
-from oscar_colony.historical_stats import LineStatistics
 from oscar_colony.historical_stats import calculate_historical_stats_for_line
 from oscar_colony.optimise.optimal_scheme_calculator import calculate_optimal_scheme
 
@@ -63,17 +62,6 @@ class ColonyManagement:
         return lines
 
     def get_line_stats(self, line_name):
-
-        return LineStatistics(
-            line_name=line_name,
-            mutations=["CAG tdTom", "Gad2-cre"],
-            n_mutations=2,
-            total_n_offspring=20,
-            total_n_genotyped_offspring=20,
-            total_n_successful_matings=10,
-            average_litter_size=6,
-            stats_per_breeding_scheme={},
-        )
 
         # Fetch all available animal data for the line (no date restrictions)
         animal_data = get_pyrat_data(

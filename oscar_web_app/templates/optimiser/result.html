@@ -34,6 +34,7 @@
           <div class="col-auto">{{ scheme_table | safe }}</div>
           <div class="col-md-4">
             <ul class="list-group list-group-flush">
+              <li class="list-group-item">Required total: {{ required_n }}</li>
               <li class="list-group-item">Expected total: {{ total_n }}</li>
               <li class="list-group-item">Expected surplus: {{ total_surplus }}</li>
             </ul>
@@ -72,10 +73,10 @@
            aria-labelledby="line-stats-heading">
         <div class="accordion-body">
           <ul class="list-group list-group-flush">
-            <li class="list-group-item">Total offspring: {{ line_stats.total_n_offspring }}</li>
-            <li class="list-group-item">Total genotyped offspring: {{ line_stats.total_n_genotyped_offspring }}</li>
-            <li class="list-group-item">Total successful matings: {{ line_stats.total_n_successful_matings }}</li>
-            <li class="list-group-item">Average litter size: {{ line_stats.average_litter_size }}</li>
+            <li class="list-group-item">Total offspring: {{ stats_total_n }}</li>
+            <li class="list-group-item">Total genotyped offspring: {{ stats_genotyped_n }}</li>
+            <li class="list-group-item">Total successful matings: {{ stats_matings_n }}</li>
+            <li class="list-group-item">Average litter size: {{ stats_litter_size }}</li>
           </ul>
         </div>
       </div>
