@@ -304,7 +304,7 @@ CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
 # django-allauth
 # ------------------------------------------------------------------------------
-ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", False)
+ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_LOGIN_METHODS = {"email"}
 # https://docs.allauth.org/en/latest/account/configuration.html
@@ -327,7 +327,7 @@ SOCIALACCOUNT_PROVIDERS = {
         "APPS": [
             {
                 "provider_id": "microsoft",
-                "name": "Microsoft Login",
+                "name": "Microsoft",
                 "client_id": env("CLIENT_ID"),
                 "secret": env("CLIENT_SECRET"),
                 "settings": {
