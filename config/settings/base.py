@@ -76,7 +76,7 @@ THIRD_PARTY_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    "allauth.socialaccount.providers.microsoft",
+    "allauth.socialaccount.providers.openid_connect",
     "django_celery_beat",
 ]
 
@@ -322,16 +322,27 @@ SOCIALACCOUNT_ADAPTER = "oscar_web_app.users.adapters.SocialAccountAdapter"
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
 SOCIALACCOUNT_FORMS = {"signup": "oscar_web_app.users.forms.UserSocialSignupForm"}
 SOCIALACCOUNT_PROVIDERS = {
-    "microsoft": {
+    "openid_connect": {
+        "OAUTH_PKCE_ENABLED": True,
         "APPS": [
             {
+                "provider_id": "microsoft",
+                "name": "Microsoft Login",
                 "client_id": env("CLIENT_ID"),
                 "secret": env("CLIENT_SECRET"),
                 "settings": {
-                    "tenant": "organizations",
+                    "fetch_userinfo": True,
+                    "oauth_pkce_enabled": True,
+                    "server_url": (
+                        f"https://login.microsoftonline.com/"
+                        f"{env('AZURE_TENANT_ID')}/v2.0"
+                    ),
+                    "token_auth_method": "client_secret_basic",
+                    # The field to be used as the account ID.
+                    "uid_field": "sub",
                 },
-            }
-        ]
+            },
+        ],
     }
 }
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
