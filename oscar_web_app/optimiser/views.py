@@ -78,6 +78,11 @@ def calculate_schemes_from_formset(formset, line_stats):
     )
 
     surplus_genotype_table = surplus.create_genotype_df()
+    required_n = (
+        surplus_genotype_table["Total N"] - surplus_genotype_table["Total N Surplus"]
+    )
+    surplus_genotype_table.insert(1, "Required N", required_n)
+
     surplus_genotype_table = surplus_genotype_table.to_html(
         classes=["table", "table-striped"], index=False, justify="unset"
     )
