@@ -7,7 +7,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from oscar_colony.breeding_scheme import Genotype
 
-from .colony_management import get_colony_management
+from .colony_management import get_colony
 from .forms import GenotypeFormSet
 from .forms import LineForm
 
@@ -30,7 +30,7 @@ def select_line(request) -> HttpResponse:
 def select_genotypes(request, line_id) -> HttpResponse:
 
     # Fetch mutation names to create custom fields in the Genotype forms
-    mutations = get_colony_management().get_line_mutations(line_id)
+    mutations = get_colony().get_line_mutations(line_id)
     if len(mutations) == 0:
         msg = "No mutations found for chosen line"
         raise Http404(msg)
@@ -96,7 +96,7 @@ def _process_genotype_dfs(df_list: list[pd.DataFrame]) -> str:
 
 def create_line_stats_context(line_name: str) -> dict[str, Any]:
 
-    line_stats = get_colony_management().get_line_stats(line_name)
+    line_stats = get_colony().get_line_stats(line_name)
 
     n_per_genotype = line_stats.total_n_offspring_per_genotype
     n_per_genotype_df = pd.DataFrame(
@@ -169,7 +169,7 @@ def create_schemes_context(formset, line_stats) -> dict[str, Any]:
 
     required_genotypes = [form.cleaned_data for form in formset]
 
-    colony_management = get_colony_management()
+    colony_management = get_colony()
     scheme_table, surplus = colony_management.optimise_schemes(
         line_stats, required_genotypes
     )

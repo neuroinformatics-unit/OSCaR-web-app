@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from django.forms import BaseFormSet
 from django.forms import formset_factory
 
-from .colony_management import get_colony_management
+from .colony_management import get_colony
 
 
 def _fetch_line_choices():
@@ -20,7 +20,7 @@ def _fetch_line_choices():
     # Start with an empty default choice
     lines = [("", "--------")]
 
-    for line_df in get_colony_management().get_lines():
+    for line_df in get_colony().get_lines():
         if not line_df.empty:
             lines.extend(
                 [(row.id, row.name) for row in line_df.itertuples(index=False)]

@@ -28,12 +28,17 @@ class ColonySoftware(StrEnum):
     PYRAT = "PYRAT"
 
 
-def get_colony_management() -> ColonyManagement:
+def get_colony() -> ColonyManagement:
+    """
+    Return the ColonyManagement class matching the COLONY_SOFTWARE env variable.
+    """
+
     colony_env = os.environ.get("COLONY_SOFTWARE", "DEV")
     if colony_env == ColonySoftware.DEV:
         return ColonyDev()
     if colony_env == ColonySoftware.PYRAT:
         return ColonyPyRAT()
+
     msg = (
         f"COLONY_SOFTWARE should be set to one of "
         f"{[software.name for software in ColonySoftware]}"
@@ -93,7 +98,7 @@ class ColonyManagement(ABC):
         return breeding_schemes, surplus
 
 
-class ColonyPyRAT:
+class ColonyPyRAT(ColonyManagement):
     """
     Class to interact with colony data from pyRAT.
     """
@@ -136,7 +141,7 @@ class ColonyPyRAT:
         return calculate_historical_stats_for_line(merged_df, line_name)
 
 
-class ColonyDev:
+class ColonyDev(ColonyManagement):
     """
     For development, this class returns fake colony data.
     """
