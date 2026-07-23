@@ -94,7 +94,24 @@
            class="accordion-collapse collapse"
            aria-labelledby="historical-stats-genotype-heading">
         <div class="accordion-body row justify-content-center">
-          <div class="col-md-8 table-responsive justify-content-center">{{ stats_genotype_table | safe }}</div>
+          <div class="col-md-8 table-responsive">{{ stats_genotype_table | safe }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="historical-stats-scheme-heading">
+        <button class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#historical-stats-scheme-collapse"
+                aria-expanded="false"
+                aria-controls="historical-stats-scheme-collapse">Historical stats - summary by scheme</button>
+      </h2>
+      <div id="historical-stats-scheme-collapse"
+           class="accordion-collapse collapse"
+           aria-labelledby="historical-stats-scheme-heading">
+        <div class="accordion-body justify-content-center">
+          <div class="table-responsive">{{ stats_scheme_table | safe }}</div>
         </div>
       </div>
     </div>

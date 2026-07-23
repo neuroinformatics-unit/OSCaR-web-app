@@ -84,6 +84,35 @@ def fetch_line_stats_context(line_name):
         classes=["table", "table-striped"], index=False, justify="unset"
     )
 
+    rows = []
+    for scheme, stats in line_stats.stats_per_breeding_scheme.items():
+        rows.append(
+            [
+                scheme,
+                stats.n_breeding_pairs,
+                stats.n_successful_matings,
+                round(stats.average_litter_size, 2),
+                round(stats.average_n_litters_per_pair, 2),
+                stats.total_n_offspring,
+                stats.total_n_genotyped_offspring,
+            ]
+        )
+    scheme_df = pd.DataFrame(
+        rows,
+        columns=[
+            "Scheme",
+            "N breeding pairs",
+            "Total successful matings",
+            "Average litter size",
+            "Average litters per pair",
+            "Total offspring",
+            "Total genotyped offspring",
+        ],
+    )
+    scheme_df = scheme_df.to_html(
+        classes=["table", "table-striped"], index=False, justify="unset"
+    )
+
     return {
         "stats_total_n": line_stats.total_n_offspring,
         "stats_genotyped_n": line_stats.total_n_genotyped_offspring,
@@ -91,6 +120,7 @@ def fetch_line_stats_context(line_name):
         "stats_litter_size": round(line_stats.average_litter_size, 2),
         "line_stats": line_stats,
         "stats_genotype_table": n_per_genotype_df,
+        "stats_scheme_table": scheme_df,
     }
 
 
