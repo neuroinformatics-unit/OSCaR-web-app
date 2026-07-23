@@ -68,10 +68,27 @@ def select_genotypes(request, line_id):
     return render(request, "optimiser/select_genotypes.html", {"formset": formset})
 
 
-def _convert_to_html_table(df: pd.DataFrame):
+def _convert_to_html_table(df: pd.DataFrame) -> str:
     return df.to_html(
         classes=["table", "table-striped"], index=False, justify="unset", na_rep=""
     )
+
+
+def _process_genotype_dfs(df_list: list[pd.DataFrame]) -> str:
+    genotype_df = pd.concat(df_list)
+    genotype_df = genotype_df.round(decimals=2)
+    genotype_df.columns = [
+        Genotype.to_string(col_name) if col_name != "Scheme" else col_name
+        for col_name in genotype_df.columns
+    ]
+
+    # Put scheme as first column, and rest of genotypes in alphabetical order
+    sorted_genotype_cols = sorted(
+        genotype_df.loc[:, genotype_df.columns != "Scheme"].columns
+    )
+    genotype_df = genotype_df[["Scheme", *sorted_genotype_cols]]
+
+    return _convert_to_html_table(genotype_df)
 
 
 def fetch_line_stats_context(line_name):
@@ -92,7 +109,7 @@ def fetch_line_stats_context(line_name):
 
     scheme_summary_rows = []
     scheme_number_dfs = []
-    scheme_proportion_rows = []
+    scheme_proportion_dfs = []
     for scheme, stats in line_stats.stats_per_breeding_scheme.items():
         scheme_summary_rows.append(
             [
@@ -106,25 +123,19 @@ def fetch_line_stats_context(line_name):
             ]
         )
 
-        scheme_number_df = pd.DataFrame([stats.n_offspring_per_genotype])
+        genotype_dicts = [
+            stats.n_offspring_per_genotype,
+            stats.proportion_offspring_per_genotype,
+        ]
+        df_lists = [scheme_number_dfs, scheme_proportion_dfs]
 
-        scheme_number_df["Scheme"] = scheme
-        scheme_number_dfs.append(scheme_number_df)
-        scheme_proportion_rows.append(
-            pd.DataFrame(stats.proportion_offspring_per_genotype.items())
-        )
+        for genotype_dict, df_list in zip(genotype_dicts, df_lists, strict=True):
+            genotype_df = pd.DataFrame([genotype_dict])
+            genotype_df["Scheme"] = scheme
+            df_list.append(genotype_df)
 
-    scheme_number_df = pd.concat(scheme_number_dfs)
-    scheme_number_df.columns = [
-        Genotype.to_string(col_name) if col_name != "Scheme" else col_name
-        for col_name in scheme_number_df.columns
-    ]
-    # Put scheme as first column, and rest of genotypes in alphabetical order
-    sorted_genotype_cols = sorted(
-        scheme_number_df.loc[:, scheme_number_df.columns != "Scheme"].columns
-    )
-    scheme_number_df = scheme_number_df["Scheme", *sorted_genotype_cols]
-    scheme_number_df = _convert_to_html_table(scheme_number_df)
+    scheme_number_df = _process_genotype_dfs(scheme_number_dfs)
+    scheme_proportion_df = _process_genotype_dfs(scheme_proportion_dfs)
 
     scheme_df = pd.DataFrame(
         scheme_summary_rows,
@@ -149,6 +160,7 @@ def fetch_line_stats_context(line_name):
         "stats_genotype_table": n_per_genotype_df,
         "stats_scheme_summary_table": scheme_df,
         "stats_scheme_number_table": scheme_number_df,
+        "stats_scheme_proportion_table": scheme_proportion_df,
     }
 
 
