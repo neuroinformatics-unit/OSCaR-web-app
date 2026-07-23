@@ -1,15 +1,18 @@
+from typing import Any
+
 import pandas as pd
 from django.http import Http404
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from oscar_colony.breeding_scheme import Genotype
 
-from .colony_management import ColonyManagement
+from .colony_management import get_colony_management
 from .forms import GenotypeFormSet
 from .forms import LineForm
 
 
-def select_line(request):
+def select_line(request) -> HttpResponse:
     if request.method == "POST":
         form = LineForm(request.POST)
         if form.is_valid():
@@ -24,10 +27,10 @@ def select_line(request):
     return render(request, "optimiser/select_line.html", {"form": form})
 
 
-def select_genotypes(request, line_id):
+def select_genotypes(request, line_id) -> HttpResponse:
 
     # Fetch mutation names to create custom fields in the Genotype forms
-    mutations = ColonyManagement().get_line_mutations(line_id)
+    mutations = get_colony_management().get_line_mutations(line_id)
     if len(mutations) == 0:
         msg = "No mutations found for chosen line"
         raise Http404(msg)
@@ -47,8 +50,8 @@ def select_genotypes(request, line_id):
                 # make request
                 pass
 
-            stats_context = fetch_line_stats_context(line_name)
-            scheme_context = calculate_schemes_from_formset(
+            stats_context = create_line_stats_context(line_name)
+            scheme_context = create_schemes_context(
                 formset, stats_context["line_stats"]
             )
 
@@ -91,11 +94,11 @@ def _process_genotype_dfs(df_list: list[pd.DataFrame]) -> str:
     return _convert_to_html_table(genotype_df)
 
 
-def fetch_line_stats_context(line_name):
+def create_line_stats_context(line_name: str) -> dict[str, Any]:
 
-    line_stats = ColonyManagement().get_line_stats(line_name)
+    line_stats = get_colony_management().get_line_stats(line_name)
+
     n_per_genotype = line_stats.total_n_offspring_per_genotype
-
     n_per_genotype_df = pd.DataFrame(
         n_per_genotype.items(),
         columns=("Genotype", "N offspring"),
@@ -103,9 +106,7 @@ def fetch_line_stats_context(line_name):
     n_per_genotype_df["Genotype"] = n_per_genotype_df["Genotype"].apply(
         Genotype.to_string
     )
-    n_per_genotype_df = n_per_genotype_df.to_html(
-        classes=["table", "table-striped"], index=False, justify="unset"
-    )
+    n_per_genotype_df = _convert_to_html_table(n_per_genotype_df)
 
     scheme_summary_rows = []
     scheme_number_dfs = []
@@ -164,17 +165,15 @@ def fetch_line_stats_context(line_name):
     }
 
 
-def calculate_schemes_from_formset(formset, line_stats):
+def create_schemes_context(formset, line_stats) -> dict[str, Any]:
 
     required_genotypes = [form.cleaned_data for form in formset]
 
-    colony_management = ColonyManagement()
+    colony_management = get_colony_management()
     scheme_table, surplus = colony_management.optimise_schemes(
         line_stats, required_genotypes
     )
-    scheme_table = scheme_table.to_html(
-        classes=["table", "table-striped"], index=False, justify="unset"
-    )
+    scheme_table = _convert_to_html_table(scheme_table)
 
     surplus_genotype_table = surplus.create_genotype_df()
     required_n = (
@@ -182,9 +181,7 @@ def calculate_schemes_from_formset(formset, line_stats):
     )
     surplus_genotype_table.insert(1, "Required N", required_n)
 
-    surplus_genotype_table = surplus_genotype_table.to_html(
-        classes=["table", "table-striped"], index=False, justify="unset"
-    )
+    surplus_genotype_table = _convert_to_html_table(surplus_genotype_table)
 
     decimal_places = 2
 
