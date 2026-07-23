@@ -68,6 +68,12 @@ def select_genotypes(request, line_id):
     return render(request, "optimiser/select_genotypes.html", {"formset": formset})
 
 
+def _convert_to_html_table(df: pd.DataFrame):
+    return df.to_html(
+        classes=["table", "table-striped"], index=False, justify="unset", na_rep=""
+    )
+
+
 def fetch_line_stats_context(line_name):
 
     line_stats = ColonyManagement().get_line_stats(line_name)
@@ -84,9 +90,11 @@ def fetch_line_stats_context(line_name):
         classes=["table", "table-striped"], index=False, justify="unset"
     )
 
-    rows = []
+    scheme_summary_rows = []
+    scheme_number_dfs = []
+    scheme_proportion_rows = []
     for scheme, stats in line_stats.stats_per_breeding_scheme.items():
-        rows.append(
+        scheme_summary_rows.append(
             [
                 scheme,
                 stats.n_breeding_pairs,
@@ -97,8 +105,29 @@ def fetch_line_stats_context(line_name):
                 stats.total_n_genotyped_offspring,
             ]
         )
+
+        scheme_number_df = pd.DataFrame([stats.n_offspring_per_genotype])
+
+        scheme_number_df["Scheme"] = scheme
+        scheme_number_dfs.append(scheme_number_df)
+        scheme_proportion_rows.append(
+            pd.DataFrame(stats.proportion_offspring_per_genotype.items())
+        )
+
+    scheme_number_df = pd.concat(scheme_number_dfs)
+    scheme_number_df.columns = [
+        Genotype.to_string(col_name) if col_name != "Scheme" else col_name
+        for col_name in scheme_number_df.columns
+    ]
+    # Put scheme as first column, and rest of genotypes in alphabetical order
+    sorted_genotype_cols = sorted(
+        scheme_number_df.loc[:, scheme_number_df.columns != "Scheme"].columns
+    )
+    scheme_number_df = scheme_number_df["Scheme", *sorted_genotype_cols]
+    scheme_number_df = _convert_to_html_table(scheme_number_df)
+
     scheme_df = pd.DataFrame(
-        rows,
+        scheme_summary_rows,
         columns=[
             "Scheme",
             "N breeding pairs",
@@ -109,9 +138,7 @@ def fetch_line_stats_context(line_name):
             "Total genotyped offspring",
         ],
     )
-    scheme_df = scheme_df.to_html(
-        classes=["table", "table-striped"], index=False, justify="unset"
-    )
+    scheme_df = _convert_to_html_table(scheme_df)
 
     return {
         "stats_total_n": line_stats.total_n_offspring,
@@ -120,7 +147,8 @@ def fetch_line_stats_context(line_name):
         "stats_litter_size": round(line_stats.average_litter_size, 2),
         "line_stats": line_stats,
         "stats_genotype_table": n_per_genotype_df,
-        "stats_scheme_table": scheme_df,
+        "stats_scheme_summary_table": scheme_df,
+        "stats_scheme_number_table": scheme_number_df,
     }
 
 
