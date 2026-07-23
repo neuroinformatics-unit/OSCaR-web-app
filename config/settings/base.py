@@ -347,6 +347,9 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_ONLY = True
+# Entra app role value required to sign in (found on the ID token's "roles" claim).
+# Set to empty string to disable the check.
+REQUIRED_APP_ROLE = env("REQUIRED_APP_ROLE", default="")
 
 # django-compressor
 # ------------------------------------------------------------------------------
