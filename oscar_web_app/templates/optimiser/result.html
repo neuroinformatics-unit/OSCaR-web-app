@@ -60,17 +60,17 @@
       </div>
     </div>
     <div class="accordion-item">
-      <h2 class="accordion-header" id="line-stats-heading">
+      <h2 class="accordion-header" id="historical-stats-line-heading">
         <button class="accordion-button collapsed"
                 type="button"
                 data-bs-toggle="collapse"
-                data-bs-target="#line-stats-collapse"
+                data-bs-target="#historical-stats-line-collapse"
                 aria-expanded="false"
-                aria-controls="line-stats-collapse">Historical stats for line</button>
+                aria-controls="historical-stats-line-collapse">Historical stats - summary for line</button>
       </h2>
-      <div id="line-stats-collapse"
+      <div id="historical-stats-line-collapse"
            class="accordion-collapse collapse"
-           aria-labelledby="line-stats-heading">
+           aria-labelledby="historical-stats-line-heading">
         <div class="accordion-body">
           <ul class="list-group list-group-flush">
             <li class="list-group-item">Total offspring: {{ stats_total_n }}</li>
@@ -78,6 +78,23 @@
             <li class="list-group-item">Total successful matings: {{ stats_matings_n }}</li>
             <li class="list-group-item">Average litter size: {{ stats_litter_size }}</li>
           </ul>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="historical-stats-genotype-heading">
+        <button class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#historical-stats-genotype-collapse"
+                aria-expanded="false"
+                aria-controls="historical-stats-genotype-collapse">Historical stats - summary by genotype</button>
+      </h2>
+      <div id="historical-stats-genotype-collapse"
+           class="accordion-collapse collapse"
+           aria-labelledby="historical-stats-genotype-heading">
+        <div class="accordion-body row justify-content-center">
+          <div class="col-md-8 table-responsive justify-content-center">{{ stats_genotype_table | safe }}</div>
         </div>
       </div>
     </div>

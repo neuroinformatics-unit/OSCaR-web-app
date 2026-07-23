@@ -80,6 +80,9 @@ def fetch_line_stats_context(line_name):
     n_per_genotype_df["Genotype"] = n_per_genotype_df["Genotype"].apply(
         Genotype.to_string
     )
+    n_per_genotype_df = n_per_genotype_df.to_html(
+        classes=["table", "table-striped"], index=False, justify="unset"
+    )
 
     return {
         "stats_total_n": line_stats.total_n_offspring,
