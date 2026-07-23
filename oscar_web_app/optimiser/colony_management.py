@@ -2,6 +2,7 @@ import os
 from enum import StrEnum
 
 import pandas as pd
+from django.http import Http404
 from oscar_colony.breeding_scheme import Genotype
 from oscar_colony.colony_management.pyrat.api import get_pyrat_data
 from oscar_colony.colony_management.pyrat.api import get_pyrat_line_mutations
@@ -69,11 +70,20 @@ class ColonyManagement:
             line_name=line_name,
         )
 
-        standardised_dfs = [
-            standardise_pyrat_csv(animal_df) for animal_df in animal_data
-        ]
+        standardised_dfs = []
+        for animal_df in animal_data:
+            if len(standardised_dfs) == 0 and animal_df.empty:
+                msg = "No animals found for chosen line"
+                raise Http404(msg)
+
+            standard_df = standardise_pyrat_csv(animal_df)
+            standardised_dfs.append(standard_df)
 
         merged_df = pd.concat(standardised_dfs)
+        if merged_df.empty:
+            msg = "No animals remain for chosen line after standardisation"
+            raise Http404(msg)
+
         return calculate_historical_stats_for_line(merged_df, line_name)
 
     def optimise_schemes(self, line_stats, genotype_form_data):
