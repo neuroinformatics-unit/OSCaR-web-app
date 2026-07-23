@@ -103,9 +103,13 @@ class ColonyManagement:
 
             required_n_per_genotype[tuple(genotype)] = genotype_data["count"]
 
-        breeding_schemes, surplus = calculate_optimal_scheme(
-            required_n_per_genotype, line_stats=line_stats, default_litter_size=6
-        )
+        try:
+            breeding_schemes, surplus = calculate_optimal_scheme(
+                required_n_per_genotype, line_stats=line_stats, default_litter_size=6
+            )
+        except ValueError as exc:
+            msg = "Optimisation failed for this line / genotypes combination."
+            raise Http404(msg) from exc
 
         # Convert breeding schemes into a table for easier viewing
         breeding_schemes = pd.DataFrame(
