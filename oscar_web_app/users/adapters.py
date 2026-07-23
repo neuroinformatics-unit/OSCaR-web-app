@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import typing
 
 from allauth.account.adapter import DefaultAccountAdapter
@@ -9,7 +10,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -20,9 +20,7 @@ if typing.TYPE_CHECKING:
     from oscar_web_app.users.models import User
 
 
-REQUIRED_APP_ROLE_MESSAGE = _(
-    "You are not authorised to use this application."
-)
+REQUIRED_APP_ROLE_MESSAGE = _("You are not authorised to use this application.")
 
 
 class AccountAdapter(DefaultAccountAdapter):
@@ -67,7 +65,7 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         required_role = getattr(settings, "REQUIRED_APP_ROLE", None)
         if not required_role:
             return
-        
+
         roles = sociallogin.account.extra_data.get("id_token", {}).get("roles", [])
         logger.info(f"User roles from social login: {roles}")
         if required_role in roles:
