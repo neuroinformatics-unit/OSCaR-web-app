@@ -111,8 +111,11 @@
            class="accordion-collapse collapse"
            aria-labelledby="historical-stats-scheme-heading">
         <div class="accordion-body justify-content-center">
+          <h3 class="my-4">Overall stats per scheme</h3>
           <div class="table-responsive">{{ stats_scheme_summary_table | safe }}</div>
+          <h3 class="my-4">Number of offspring per scheme</h3>
           <div class="table-responsive">{{ stats_scheme_number_table | safe }}</div>
+          <h3 class="my-4">Proportion of offspring per scheme</h3>
           <div class="table-responsive">{{ stats_scheme_proportion_table | safe }}</div>
         </div>
       </div>
