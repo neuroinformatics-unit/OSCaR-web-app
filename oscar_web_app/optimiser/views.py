@@ -73,7 +73,16 @@ def select_genotypes(request, line_id) -> HttpResponse:
 
 def _convert_to_html_table(df: pd.DataFrame) -> str:
     return df.to_html(
-        classes=["table", "table-striped"], index=False, justify="unset", na_rep=""
+        classes=[
+            "table",
+            "table-striped",
+            "table-bordered",
+            "text-center",
+            "align-middle",
+        ],
+        index=False,
+        justify="center",
+        na_rep="",
     )
 
 
