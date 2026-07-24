@@ -62,6 +62,11 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         request: HttpRequest,
         sociallogin: SocialLogin,
     ) -> None:
+        """
+        Check users have the REQUIRED_APP_ROLE (if provided) before they
+        are allowed to login.
+        """
+
         required_role = getattr(settings, "REQUIRED_APP_ROLE", None)
         if not required_role:
             return
