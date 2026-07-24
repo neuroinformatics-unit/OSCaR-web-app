@@ -67,7 +67,9 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
             return
 
         roles = sociallogin.account.extra_data.get("id_token", {}).get("roles", [])
-        logger.info(f"User roles from social login: {roles}")
+
+        msg = f"User roles from social login: {roles}"
+        logger.info(msg)
         if required_role in roles:
             return
 
