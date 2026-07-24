@@ -5,7 +5,7 @@ description = "A web application to view data processed via OSCaR."
 readme = "README.md"
 license = { text = "BSD" }
 authors = [
-  { name = "UCL ARC", email = "arc.collaborations@ucl.ac.uk" },
+  { name = "Kimberly Meechan, Neuroinformatics Unit", email = "code@adamltyson.com" },
 ]
 requires-python = "==3.14.*"
 classifiers = [
