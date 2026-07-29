@@ -10,8 +10,7 @@ Make sure [docker compose](https://docs.docker.com/compose/) is available. Depen
 
 ## Setting up `.envs/.local` files
 
-- auth 
-- pyrat
+TBD
 
 ## Running the app locally
 
@@ -38,11 +37,75 @@ docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml down
 
 ## Debugging the app
 
-- django sidebar
-- devtools
-- attaching a debugger with full instructions
+There are a few different options to debug issues inside the app:
+
+### django-debug-toolbar
+
+[`django-debug-toolbar`](https://github.com/django-commons/django-debug-toolbar) is included by default.
+
+When you run the app locally, this creates an expandable sidebar at the right side of the browser window. This contains various useful options for viewing django-related data.
+
+### Werkzeug
+
+When you start the app locally, you will see the following logged in the terminal:
+```
+* Debugger is active!
+* Debugger PIN: ###-###-###
+```
+
+This comes from [`Werkzeug`](https://werkzeug.palletsprojects.com/en/stable/) (which is included by default). If the app throws an error, `Werkzeug` will display a page with a full traceback (see the [Werzeug debugging docs](https://werkzeug.palletsprojects.com/en/stable/debug/#using-the-debugger)). 
+
+By hovering over any codeblock on this page, you can click the terminal icon that appears at the right hand side. Then, by entering the PIN that was printed out in the terminal, you can enter a full interactive terminal at that point.
+
+### Attaching a debugger
+
+To attach a full debugger e.g. via an IDE like VSCode, first inside `.envs/.local/.django` set:
+```
+START_WITH_DEBUGPY=yes
+```
+
+Then you will need to setup your IDE to allow attachment. Here, we give an example for VSCode, but similar settings should work for other IDEs.
+In your `.vscode/launch.json`, add an attach configuration like so:
+```
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Python Debugger: Remote Attach",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "/app"
+                }
+            ],
+            "justMyCode":false  
+        }
+    ]
+}
+```
+
+Now start the app via docker using the commands in the [running the app locally section](#running-the-app-locally). After a bit of time, you should see that it pauses and waits for you to attach the debugger.
+
+In VSCode, go to the 'Run and Debug tab' (left sidebar) and click the green arrow at the top. If successful, you should see execution continue and the app appear in the browser as normal. If you place a debug point on a line of code in VSCode, execution will now pause there, giving you full access to the debugger.
 
 ## Pre-commit
+
+We use [pre-commit](https://pre-commit.com/) for automated linting / formatting.
+
+`pre-commit` is included in the package's `dev` dependencies, so running `uv sync` will install it.
+
+Then run:
+```
+# setup pre-commit to run on every commit
+pre-commit install
+```
 
 ## Building the docs locally
 
