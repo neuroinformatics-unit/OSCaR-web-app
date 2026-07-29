@@ -106,7 +106,7 @@ html_theme_options = {
 # Sphinx will create the appropriate CNAME file in the build directory
 # The default is the URL of the GitHub pages
 # https://www.sphinx-doc.org/en/master/usage/extensions/githubpages.html
-html_baseurl = "https://oscar.neuroinformatics.dev"
+html_baseurl = "https://oscar-docs.neuroinformatics.dev"
 sitemap_url_scheme = "{link}"
 
 # Add any paths that contain custom static files (such as style sheets) here,
