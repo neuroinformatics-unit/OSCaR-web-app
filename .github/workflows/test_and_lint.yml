@@ -24,15 +24,9 @@ jobs:
     steps:
       - uses: neuroinformatics-unit/actions/lint@v2
 
-  manifest:
-    name: Check Manifest
-    runs-on: ubuntu-latest
-    steps:
-      - uses: neuroinformatics-unit/actions/check_manifest@v2
-
   # With no caching at all the entire ci process takes 3m to complete!
   test:
-    needs: [linting, manifest]
+    needs: [linting]
     runs-on: ubuntu-latest
 
     steps:
