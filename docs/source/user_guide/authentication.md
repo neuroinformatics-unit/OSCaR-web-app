@@ -38,7 +38,7 @@ We'll fill in these values later.
 
 ## Create an app role
 
-To control who can access our app, we can assign 'roles'. Under `Manage > App roles` click 'Create app role':
+To control who can access the app, we can assign 'roles'. Under `Manage > App roles` click 'Create app role':
 - Set the name as you like e.g. 'Oscar users'
 - Set allowed member types to `Users/Groups`
 - Set the value as you like e.g. `oscar.use`

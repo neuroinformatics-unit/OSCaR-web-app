@@ -15,7 +15,7 @@ Make sure [docker compose](https://docs.docker.com/compose/) is available. Depen
 - See the [authentication docs](./authentication.md) for details on how to setup the `.auth` file.
 - See the [colony docs](./colony_management.md) for details of how to setup the `.colony` file (if required)
 
-## Running the app locally
+## Running the app
 
 Build the app:
 ```bash

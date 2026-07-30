@@ -4,7 +4,7 @@
 
 See the [local deployment docs](./user_guide/local_deployment.md) for how to install and run the app locally.
 
-While the app is running via `docker`, hot-reloading is supported, This means you should be able to edit code files directly, then refresh your browser window to see the result (without stopping the docker containers).
+While the app is running via `docker`, hot-reloading is supported. This means you should be able to edit code files directly, then refresh your browser window to see the result (without stopping the docker containers).
 
 **Note**: if you change values in your `.envs` files, you will need to stop and re-start the app to see the effects. If you change the app's dependencies, then you will also need to re-build it.
 
@@ -64,7 +64,7 @@ In your `.vscode/launch.json`, add an attach configuration like so:
 }
 ```
 
-Now start the app via docker using the commands in the [running the app locally section](#running-the-app-locally). After a bit of time, you should see that it pauses and waits for you to attach the debugger.
+Now start the app via docker using the commands in the [local deployment](./user_guide/local_deployment.md#running-the-app). After a bit of time, you should see that it pauses and waits for you to attach the debugger.
 
 In VSCode, go to the 'Run and Debug tab' (left sidebar) and click the green arrow at the top. If successful, you should see execution continue and the app appear in the browser as normal. If you place a debug point on a line of code in VSCode, execution will now pause there, giving you full access to the debugger.
 
@@ -90,7 +90,7 @@ To install `oscar-colony` from a github branch, you can run:
 uv add git+https://github.com/neuroinformatics-unit/OSCaR@BRANCH-NAME
 ```
 
-Then you can re-build and run the app (see the [local deployment docs](./user_guide/local_deployment.md#running-the-app-locally) for commands) and it should use the branch's version.
+Then you can re-build and run the app (see the [local deployment docs](./user_guide/local_deployment.md#running-the-app) for commands) and it should use the branch's version.
 
 If updates are made to the branch, you can fetch them with:
 ```
