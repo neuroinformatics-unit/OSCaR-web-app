@@ -3,7 +3,7 @@ name = "oscar-web-app"
 version = "0.1.0"
 description = "A web application to view data processed via OSCaR."
 readme = "README.md"
-license = { text = "BSD" }
+license = "BSD-3-Clause"
 authors = [
   { name = "Kimberly Meechan, Neuroinformatics Unit", email = "code@adamltyson.com" },
 ]
