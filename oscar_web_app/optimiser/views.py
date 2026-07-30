@@ -51,12 +51,12 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
             error_messages=error_messages,
         )
         if formset.is_valid():
-            # run calculation
             line_name = request.session.get(str(line_id))
             if line_name is None:
-                # make request
-                pass
+                msg = f"Line name not found for id: {line_id}"
+                raise Http404(msg)
 
+            # Run optimisation calculations and render the results
             context = create_result_page_context(line_name, formset)
             return render(
                 request,
