@@ -78,11 +78,6 @@ exclude_patterns = [
     "**/includes/**",
 ]
 
-# URLs to skip running the linkchecker for
-linkcheck_anchors_ignore_for_url = [
-    "http://localhost:8000",
-]
-
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 html_theme = "pydata_sphinx_theme"

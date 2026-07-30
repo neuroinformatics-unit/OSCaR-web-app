@@ -27,7 +27,7 @@ Run the app:
 docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml up
 ```
 
-Go to [http://localhost:8000](http://localhost:8000) in your browser, and you should see the website.
+Go to `http://localhost:8000` in your browser, and you should see the website.
 
 To stop the app:
 ```bash
