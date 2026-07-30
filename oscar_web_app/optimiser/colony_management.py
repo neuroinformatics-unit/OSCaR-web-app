@@ -15,10 +15,13 @@ from oscar_colony.colony_management.pyrat.standardise import standardise_pyrat_c
 from oscar_colony.historical_stats import BreedingSchemeStatistics
 from oscar_colony.historical_stats import LineStatistics
 from oscar_colony.historical_stats import calculate_historical_stats_for_line
+from oscar_colony.optimise.optimal_scheme_calculator import SurplusSummary
 from oscar_colony.optimise.optimal_scheme_calculator import calculate_optimal_scheme
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
+    from .forms import GenotypeFormSet
 
 
 class ColonySoftware(StrEnum):
@@ -57,14 +60,35 @@ class ColonyManagement(ABC):
         pass
 
     @abstractmethod
-    def get_line_mutations(self, line_id) -> list[str]:
+    def get_line_mutations(self, line_id: int) -> list[str]:
         pass
 
     @abstractmethod
-    def get_line_stats(self, line_name) -> LineStatistics:
+    def get_line_stats(self, line_name: str) -> LineStatistics:
         pass
 
-    def optimise_schemes(self, line_stats, genotype_form_data):
+    def optimise_schemes(
+        self, line_stats: LineStatistics, genotype_formset: GenotypeFormSet
+    ) -> tuple[dict[BreedingScheme, int], SurplusSummary]:
+        """
+        Calculate optimal breeding schemes for the given line.
+
+        Parameters
+        ----------
+        line_stats : LineStatistics
+            Historical stats for the line.
+        genotype_formset : GenotypeFormset
+            The completed genotype formset for this line.
+
+        Returns
+        -------
+        tuple[dict[BreedingScheme, int], SurplusSummary]
+            Returns 2 items:
+            - optimal number of matings per breeding scheme
+            - a summary of the surplus numbers for this optimal scheme
+              combination
+        """
+
         # Get names of line mutations. This is the mutation order
         # we must match in required_n_per_genotype
         mutation_names = line_stats.mutations
@@ -72,6 +96,8 @@ class ColonyManagement(ABC):
         # Take genotype form data and re-arrange it into the format
         # required for calculate_optimal_scheme
         required_n_per_genotype = {}
+        genotype_form_data = [form.cleaned_data for form in genotype_formset]
+
         for genotype_data in genotype_form_data:
             genotype = []
             for mutation_name in mutation_names:
@@ -88,13 +114,6 @@ class ColonyManagement(ABC):
             msg = "Optimisation failed for this line / genotypes combination."
             raise Http404(msg) from exc
 
-        # Convert breeding schemes into a table for easier viewing
-        breeding_schemes = pd.DataFrame(
-            breeding_schemes.items(),
-            columns=("Scheme", "N matings"),
-            dtype=str,
-        )
-
         return breeding_schemes, surplus
 
 
@@ -108,12 +127,12 @@ class ColonyPyRAT(ColonyManagement):
 
         return get_pyrat_lines()
 
-    def get_line_mutations(self, line_id) -> list[str]:
+    def get_line_mutations(self, line_id: int) -> list[str]:
         """Get names of mutations for the given line"""
 
         return get_pyrat_line_mutations(line_id)
 
-    def get_line_stats(self, line_name) -> LineStatistics:
+    def get_line_stats(self, line_name: str) -> LineStatistics:
         """Get historical stats for the given line"""
 
         # Fetch all available animal data for the line (no date restrictions)
@@ -153,7 +172,7 @@ class ColonyDev(ColonyManagement):
             pd.DataFrame({"name": ["Line-A", "Line-AB", "Line-ABC"], "id": [1, 2, 3]})
         ]
 
-    def get_line_mutations(self, line_id) -> list[str]:
+    def get_line_mutations(self, line_id: int) -> list[str]:
         """Get names of mutations for the given line"""
 
         if line_id == 1:
@@ -162,7 +181,8 @@ class ColonyDev(ColonyManagement):
             return ["Mut-A", "Mut-B"]
         return ["Mut-A", "Mut-B", "Mut-C"]
 
-    def get_line_stats(self, line_name) -> LineStatistics:
+    def get_line_stats(self, line_name: str) -> LineStatistics:
+        """Get historical stats for the given line"""
 
         if line_name == "Line-A":
             return LineStatistics(

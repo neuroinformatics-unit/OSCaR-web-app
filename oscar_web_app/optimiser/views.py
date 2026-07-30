@@ -1,18 +1,25 @@
+from typing import TYPE_CHECKING
 from typing import Any
 
 import pandas as pd
 from django.http import Http404
+from django.http import HttpRequest
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
-from oscar_colony.breeding_scheme import Genotype
 
 from .colony_management import get_colony
 from .forms import GenotypeFormSet
 from .forms import LineForm
 
+if TYPE_CHECKING:
+    from oscar_colony.breeding_scheme import BreedingScheme
+    from oscar_colony.historical_stats import LineStatistics
+    from oscar_colony.optimise.surplus_summary import SurplusSummary
 
-def select_line(request) -> HttpResponse:
+
+def select_line(request: HttpRequest) -> HttpResponse:
+
     if request.method == "POST":
         form = LineForm(request.POST)
         if form.is_valid():
@@ -27,7 +34,7 @@ def select_line(request) -> HttpResponse:
     return render(request, "optimiser/select_line.html", {"form": form})
 
 
-def select_genotypes(request, line_id) -> HttpResponse:
+def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
 
     # Fetch mutation names to create custom fields in the Genotype forms
     mutations = get_colony().get_line_mutations(line_id)
@@ -50,13 +57,7 @@ def select_genotypes(request, line_id) -> HttpResponse:
                 # make request
                 pass
 
-            stats_context = create_line_stats_context(line_name)
-            scheme_context = create_schemes_context(
-                formset, stats_context["line_stats"]
-            )
-
-            context = stats_context | scheme_context
-
+            context = create_result_page_context(line_name, formset)
             return render(
                 request,
                 "optimiser/result.html",
@@ -72,6 +73,8 @@ def select_genotypes(request, line_id) -> HttpResponse:
 
 
 def _convert_to_html_table(df: pd.DataFrame) -> str:
+    """Convert a Pandas DataFrame into an HTML table"""
+
     return df.to_html(
         classes=[
             "table",
@@ -86,113 +89,104 @@ def _convert_to_html_table(df: pd.DataFrame) -> str:
     )
 
 
-def _process_genotype_dfs(df_list: list[pd.DataFrame]) -> str:
-    genotype_df = pd.concat(df_list)
-    genotype_df = genotype_df.round(decimals=2)
-    genotype_df.columns = [
-        Genotype.to_string(col_name) if col_name != "Scheme" else col_name
-        for col_name in genotype_df.columns
-    ]
+def create_result_page_context(
+    line_name: str, formset: GenotypeFormSet
+) -> dict[str, Any]:
+    """
+    Run the optimisation calculations for the given line_name, and create
+    a context dict with required values for the results page.
 
-    # Put scheme as first column, and rest of genotypes in alphabetical order
-    sorted_genotype_cols = sorted(
-        genotype_df.loc[:, genotype_df.columns != "Scheme"].columns
+    Parameters
+    ----------
+    line_name : str
+        Name of the line
+    formset : GenotypeFormSet
+        The completed genotype formset for this line
+
+    Returns
+    -------
+    dict[str, Any]
+        Context required for results page
+    """
+    colony_management = get_colony()
+    line_stats = colony_management.get_line_stats(line_name)
+    schemes, surplus = colony_management.optimise_schemes(line_stats, formset)
+
+    stats_context = create_line_stats_context(line_stats)
+    scheme_context = create_schemes_context(schemes, surplus)
+
+    return stats_context | scheme_context
+
+
+def create_line_stats_context(
+    line_stats: LineStatistics, decimal_places: int = 2
+) -> dict[str, Any]:
+    """Create context with values from the given LineStatistics.
+
+    Parameters
+    ----------
+    line_stats : LineStatistics
+        Historical stats for the line.
+    decimal_places : int, optional
+        Number of decimal places to round values to.
+
+    Returns
+    -------
+    dict[str, Any]
+        Context dict
+    """
+
+    n_per_genotype_df = _convert_to_html_table(line_stats.create_n_per_genotype_df())
+    scheme_summary_df = _convert_to_html_table(
+        line_stats.create_scheme_summary_df(decimal_places)
     )
-    genotype_df = genotype_df[["Scheme", *sorted_genotype_cols]]
-
-    return _convert_to_html_table(genotype_df)
-
-
-def create_line_stats_context(line_name: str) -> dict[str, Any]:
-
-    line_stats = get_colony().get_line_stats(line_name)
-
-    n_per_genotype = line_stats.total_n_offspring_per_genotype
-    n_per_genotype_df = pd.DataFrame(
-        n_per_genotype.items(),
-        columns=("Genotype", "N offspring"),
+    scheme_number_df = _convert_to_html_table(line_stats.create_scheme_number_df())
+    scheme_proportion_df = _convert_to_html_table(
+        line_stats.create_scheme_proportion_df(decimal_places)
     )
-    n_per_genotype_df["Genotype"] = n_per_genotype_df["Genotype"].apply(
-        Genotype.to_string
-    )
-    n_per_genotype_df = _convert_to_html_table(n_per_genotype_df)
-
-    scheme_summary_rows = []
-    scheme_number_dfs = []
-    scheme_proportion_dfs = []
-    for scheme, stats in line_stats.stats_per_breeding_scheme.items():
-        scheme_summary_rows.append(
-            [
-                scheme,
-                stats.n_breeding_pairs,
-                stats.n_successful_matings,
-                round(stats.average_litter_size, 2),
-                round(stats.average_n_litters_per_pair, 2),
-                stats.total_n_offspring,
-                stats.total_n_genotyped_offspring,
-            ]
-        )
-
-        genotype_dicts = [
-            stats.n_offspring_per_genotype,
-            stats.proportion_offspring_per_genotype,
-        ]
-        df_lists = [scheme_number_dfs, scheme_proportion_dfs]
-
-        for genotype_dict, df_list in zip(genotype_dicts, df_lists, strict=True):
-            genotype_df = pd.DataFrame([genotype_dict])
-            genotype_df["Scheme"] = scheme
-            df_list.append(genotype_df)
-
-    scheme_number_df = _process_genotype_dfs(scheme_number_dfs)
-    scheme_proportion_df = _process_genotype_dfs(scheme_proportion_dfs)
-
-    scheme_df = pd.DataFrame(
-        scheme_summary_rows,
-        columns=[
-            "Scheme",
-            "N breeding pairs",
-            "Total successful matings",
-            "Average litter size",
-            "Average litters per pair",
-            "Total offspring",
-            "Total genotyped offspring",
-        ],
-    )
-    scheme_df = _convert_to_html_table(scheme_df)
 
     return {
         "stats_total_n": line_stats.total_n_offspring,
         "stats_genotyped_n": line_stats.total_n_genotyped_offspring,
         "stats_matings_n": line_stats.total_n_successful_matings,
-        "stats_litter_size": round(line_stats.average_litter_size, 2),
-        "line_stats": line_stats,
+        "stats_litter_size": round(line_stats.average_litter_size, decimal_places),
         "stats_genotype_table": n_per_genotype_df,
-        "stats_scheme_summary_table": scheme_df,
+        "stats_scheme_summary_table": scheme_summary_df,
         "stats_scheme_number_table": scheme_number_df,
         "stats_scheme_proportion_table": scheme_proportion_df,
     }
 
 
-def create_schemes_context(formset, line_stats) -> dict[str, Any]:
+def create_schemes_context(
+    schemes: dict[BreedingScheme, int], surplus: SurplusSummary, decimal_places: int = 2
+) -> dict[str, Any]:
+    """Create context with values from calculated breeding schemes / surplus.
 
-    required_genotypes = [form.cleaned_data for form in formset]
+    Parameters
+    ----------
+    schemes : dict[BreedingScheme, int]
+        Calculated breeding schemes
+    surplus : SurplusSummary
+        Calculated surplus
+    decimal_places : int, optional
+        Number of decimal places to round values to.
 
-    colony_management = get_colony()
-    scheme_table, surplus = colony_management.optimise_schemes(
-        line_stats, required_genotypes
+    Returns
+    -------
+    dict[str, Any]
+        Context dict
+    """
+
+    # Convert breeding schemes into a table for easier viewing
+    scheme_table = pd.DataFrame(
+        schemes.items(),
+        columns=("Scheme", "N matings"),
+        dtype=str,
     )
     scheme_table = _convert_to_html_table(scheme_table)
 
-    surplus_genotype_table = surplus.create_genotype_df()
-    required_n = (
-        surplus_genotype_table["Total N"] - surplus_genotype_table["Total N Surplus"]
-    )
-    surplus_genotype_table.insert(1, "Required N", required_n)
-
+    surplus_genotype_table = surplus.create_genotype_df(decimal_places)
     surplus_genotype_table = _convert_to_html_table(surplus_genotype_table)
-
-    decimal_places = 2
 
     return {
         "scheme_table": scheme_table,
