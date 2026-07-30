@@ -80,6 +80,23 @@ Then run:
 pre-commit install
 ```
 
+## Installing dev versions of oscar-colony
+
+Sometimes, when working on a new feature, it is useful to temporarily install an un-released version of [`oscar-colony`](https://github.com/neuroinformatics-unit/OSCaR). 
+
+To install `oscar-colony` from a github branch, you can run:
+```
+# Replace BRANCH-NAME with the branch you want to install from
+uv add git+https://github.com/neuroinformatics-unit/OSCaR@BRANCH-NAME
+```
+
+Then you can re-build and run the app (see the [local deployment docs](./user_guide/local_deployment.md#running-the-app-locally) for commands) and it should use the branch's version.
+
+If updates are made to the branch, you can fetch them with:
+```
+uv sync --upgrade
+```
+
 ## Building the docs locally
 
 To build the documentation locally, you will need to install some additional dependencies, then run `sphinx-build` (as below).
