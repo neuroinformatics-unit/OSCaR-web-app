@@ -1,3 +1,7 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [ "setuptools>=77" ]
+
 [project]
 name = "oscar-web-app"
 version = "0.1.0"
@@ -69,6 +73,9 @@ docs = [
   "sphinx-design==0.7.0",
   "sphinx-sitemap==2.9.0"
 ]
+
+[tool.setuptools]
+packages = [ "oscar_web_app" ]
 
 # ==== djLint ====
 [tool.djlint]
