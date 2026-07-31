@@ -72,8 +72,30 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
     return render(request, "optimiser/select_genotypes.html", {"formset": formset})
 
 
-def _convert_to_html_table(df: pd.DataFrame) -> str:
-    """Convert a Pandas DataFrame into an HTML table"""
+def _strip_decimal_places(input_value: float) -> str:
+    return f"{input_value:.0f}"
+
+
+def _convert_to_html_table(
+    df: pd.DataFrame, *, format_float_as_int: bool = False
+) -> str:
+    """Convert a Pandas DataFrame into an HTML table.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Pandas DataFrame to convert
+    format_float_as_int : bool, optional
+        If True, decimal places will be stripped from all float values e.g.
+        6.0 -> 6
+
+    Returns
+    -------
+    str
+        HTML table
+    """
+
+    float_format = _strip_decimal_places if format_float_as_int else None
 
     return df.to_html(
         classes=[
@@ -86,6 +108,7 @@ def _convert_to_html_table(df: pd.DataFrame) -> str:
         index=False,
         justify="center",
         na_rep="",
+        float_format=float_format,
     )
 
 
@@ -140,12 +163,16 @@ def create_line_stats_context(
     scheme_summary_df = _convert_to_html_table(
         line_stats.create_scheme_summary_df(decimal_places)
     )
-    scheme_number_df = _convert_to_html_table(line_stats.create_scheme_number_df())
+    scheme_number_df = _convert_to_html_table(
+        line_stats.create_scheme_number_df(), format_float_as_int=True
+    )
     scheme_proportion_df = _convert_to_html_table(
         line_stats.create_scheme_proportion_df(decimal_places)
     )
 
     return {
+        "line_name": line_stats.line_name,
+        "mutations": line_stats.mutations,
         "stats_total_n": line_stats.total_n_offspring,
         "stats_genotyped_n": line_stats.total_n_genotyped_offspring,
         "stats_matings_n": line_stats.total_n_successful_matings,
