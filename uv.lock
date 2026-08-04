@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = "==3.14.*"
 resolution-markers = [
     "sys_platform == 'win32'",
@@ -1259,7 +1259,7 @@ wheels = [
 
 [[package]]
 name = "oscar-colony"
-version = "0.0.5"
+version = "0.0.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
@@ -1267,9 +1267,9 @@ dependencies = [
     { name = "requests" },
     { name = "scipy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/41/0d/e84c14ee5c67aac37bd46ba2a7e8d49def61f3ebe3a50aa340b4743667e4/oscar_colony-0.0.5.tar.gz", hash = "sha256:267294bb159856bc0e7ee03653b5e89d36ae160cd60cc4ffee1fc6bd702cf90c", size = 21797, upload-time = "2026-07-07T15:37:26.42Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/06/7a/b240ad13f491114f18d069e1f04670bc4b846bec4afe4c8cf2701782b78c/oscar_colony-0.0.7.tar.gz", hash = "sha256:3d6c4dc3850efab0a0f9be24dd2743d59a21d2e84725c4d3919613c76b638690", size = 25372, upload-time = "2026-08-03T14:09:34.157Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ac/76/45126c694696edf5b8efe2ee127bd7d4e2b0164b104f3df76a281ef4e2a1/oscar_colony-0.0.5-py3-none-any.whl", hash = "sha256:3fde66dc45fb0d74f7b9cb0d5c3331622eaa73af858ab7a64d32aa16d475dcb6", size = 22705, upload-time = "2026-07-07T15:37:25.497Z" },
+    { url = "https://files.pythonhosted.org/packages/6d/17/5906208e0c25f39c7acc0e5695a81c88788a5345ff69ad1d382f7000c806/oscar_colony-0.0.7-py3-none-any.whl", hash = "sha256:ea3be41a819707e73a0b9df4c0ea843e49e832f94854b3475a6723e583c40066", size = 25594, upload-time = "2026-08-03T14:09:33.303Z" },
 ]
 
 [[package]]
@@ -1344,7 +1344,7 @@ requires-dist = [
     { name = "flower", specifier = "==2.0.1" },
     { name = "gunicorn", specifier = "==26.0.0" },
     { name = "hiredis", specifier = "==3.4.0" },
-    { name = "oscar-colony", specifier = "==0.0.5" },
+    { name = "oscar-colony", specifier = "==0.0.7" },
     { name = "pillow", specifier = "==12.2.0" },
     { name = "psycopg", extras = ["binary"], marker = "sys_platform == 'win32'", specifier = "==3.3.4" },
     { name = "psycopg", extras = ["c"], marker = "sys_platform != 'win32'", specifier = "==3.3.4" },
