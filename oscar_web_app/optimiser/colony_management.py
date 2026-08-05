@@ -1,10 +1,10 @@
-import os
 from abc import ABC
 from abc import abstractmethod
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
 import pandas as pd
+from django.conf import settings
 from django.http import Http404
 from oscar_colony.breeding_scheme import BreedingScheme
 from oscar_colony.breeding_scheme import Genotype
@@ -33,20 +33,22 @@ class ColonySoftware(StrEnum):
 
 def get_colony() -> ColonyManagement:
     """
-    Return the ColonyManagement class matching the COLONY_SOFTWARE env variable.
+    Return the ColonyManagement class matching the COLONY_SOFTWARE setting.
     """
 
-    colony_env = os.environ.get("COLONY_SOFTWARE", "DEV")
-    if colony_env == ColonySoftware.DEV:
-        return ColonyDev()
-    if colony_env == ColonySoftware.PYRAT:
-        return ColonyPyRAT()
+    match settings.COLONY_SOFTWARE:
+        case ColonySoftware.DEV:
+            return ColonyDev()
 
-    msg = (
-        f"COLONY_SOFTWARE should be set to one of "
-        f"{[software.name for software in ColonySoftware]}"
-    )
-    raise NotImplementedError(msg)
+        case ColonySoftware.PYRAT:
+            return ColonyPyRAT()
+
+        case _:
+            msg = (
+                f"COLONY_SOFTWARE should be set to one of "
+                f"{[software.name for software in ColonySoftware]}"
+            )
+            raise NotImplementedError(msg)
 
 
 class ColonyManagement(ABC):

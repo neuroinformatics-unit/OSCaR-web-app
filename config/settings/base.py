@@ -325,5 +325,8 @@ SOCIALACCOUNT_FORMS = {"signup": "oscar_web_app.users.forms.UserSocialSignupForm
 INSTALLED_APPS += ["compressor"]
 STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
 
-# Your stuff...
+# oscar specific
 # ------------------------------------------------------------------------------
+
+# Set which colony software to pull data from
+COLONY_SOFTWARE = env("COLONY_SOFTWARE", default="DEV")
