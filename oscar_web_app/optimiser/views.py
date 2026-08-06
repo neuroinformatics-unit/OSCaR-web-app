@@ -51,10 +51,11 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
             error_messages=error_messages,
         )
         if formset.is_valid():
+            # Fetch line name from session data. If not present, fetch
+            # via the colony software API
             line_name = request.session.get(str(line_id))
             if line_name is None:
-                msg = f"Line name not found for id: {line_id}"
-                raise Http404(msg)
+                line_name = get_colony().get_line_name(line_id)
 
             # Run optimisation calculations and render the results
             context = create_result_page_context(line_name, formset)
