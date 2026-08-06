@@ -77,8 +77,8 @@ THIRD_PARTY_APPS = [
     "crispy_bootstrap5",
     "allauth",
     "allauth.account",
-    "allauth.mfa",
     "allauth.socialaccount",
+    "allauth.socialaccount.providers.openid_connect",
     "django_celery_beat",
 ]
 
@@ -104,7 +104,7 @@ AUTHENTICATION_BACKENDS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
-LOGIN_REDIRECT_URL = "users:redirect"
+LOGIN_REDIRECT_URL = "home"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
 LOGIN_URL = "account_login"
 
@@ -139,6 +139,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.auth.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
@@ -302,6 +303,7 @@ CELERY_WORKER_SEND_TASK_EVENTS = True
 CELERY_TASK_SEND_SENT_EVENT = True
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#worker-hijack-root-logger
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+
 # django-allauth
 # ------------------------------------------------------------------------------
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
@@ -312,7 +314,7 @@ ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 # https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = "none"
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_ADAPTER = "oscar_web_app.users.adapters.AccountAdapter"
 # https://docs.allauth.org/en/latest/account/forms.html
@@ -321,6 +323,36 @@ ACCOUNT_FORMS = {"signup": "oscar_web_app.users.forms.UserSignupForm"}
 SOCIALACCOUNT_ADAPTER = "oscar_web_app.users.adapters.SocialAccountAdapter"
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
 SOCIALACCOUNT_FORMS = {"signup": "oscar_web_app.users.forms.UserSocialSignupForm"}
+SOCIALACCOUNT_PROVIDERS = {
+    "openid_connect": {
+        "OAUTH_PKCE_ENABLED": True,
+        "APPS": [
+            {
+                "provider_id": "microsoft",
+                "name": "Microsoft",
+                "client_id": env("CLIENT_ID", default=""),
+                "secret": env("CLIENT_SECRET", default=""),
+                "settings": {
+                    "fetch_userinfo": True,
+                    "oauth_pkce_enabled": True,
+                    "server_url": (
+                        f"https://login.microsoftonline.com/"
+                        f"{env('AZURE_TENANT_ID', default='')}/v2.0"
+                    ),
+                    "token_auth_method": "client_secret_basic",
+                    # The field to be used as the account ID.
+                    "uid_field": "sub",
+                },
+            },
+        ],
+    }
+}
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+SOCIALACCOUNT_ONLY = True
+# Entra app role value required to sign in (found on the ID token's "roles" claim).
+# Set to empty string to disable the check.
+REQUIRED_APP_ROLE = env("REQUIRED_APP_ROLE", default="")
+
 # django-compressor
 # ------------------------------------------------------------------------------
 # https://django-compressor.readthedocs.io/en/latest/quickstart/#installation
