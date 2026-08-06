@@ -1,16 +1,26 @@
 from __future__ import annotations
 
+import logging
 import typing
 
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.core.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.utils.translation import gettext_lazy as _
+
+logger = logging.getLogger(__name__)
 
 if typing.TYPE_CHECKING:
     from allauth.socialaccount.models import SocialLogin
     from django.http import HttpRequest
 
     from oscar_web_app.users.models import User
+
+
+REQUIRED_APP_ROLE_MESSAGE = _("You are not authorised to use this application.")
 
 
 class AccountAdapter(DefaultAccountAdapter):
@@ -46,3 +56,27 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
                 if last_name := data.get("last_name"):
                     user.name += f" {last_name}"
         return user
+
+    def pre_social_login(
+        self,
+        request: HttpRequest,
+        sociallogin: SocialLogin,
+    ) -> None:
+        """
+        Check users have the REQUIRED_APP_ROLE (if provided) before they
+        are allowed to login.
+        """
+
+        required_role = getattr(settings, "REQUIRED_APP_ROLE", None)
+        if not required_role:
+            return
+
+        roles = sociallogin.account.extra_data.get("id_token", {}).get("roles", [])
+
+        msg = f"User roles from social login: {roles}"
+        logger.info(msg)
+        if required_role in roles:
+            return
+
+        messages.error(request, REQUIRED_APP_ROLE_MESSAGE)
+        raise ImmediateHttpResponse(redirect("account_login"))
