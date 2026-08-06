@@ -15,7 +15,7 @@ PYRAT_URL=https://my-pyrat-url
 PYRAT_CLIENT_TOKEN=my-pyrat-client-token
 PYRAT_USER_TOKEN=my-pyrat-user-token
 ```
-You will need to update `PYRAT_URL` / `PYRAT_CLIENT_TOKEN`/ `PYRAT_USER_TOKEN` to match your PyRAT instance. See the [oscar-colony pyrat docs](https://oscar-api.neuroinformatics.dev/) for how to create the required tokens.
+You will need to update `PYRAT_URL` / `PYRAT_CLIENT_TOKEN`/ `PYRAT_USER_TOKEN` to match your PyRAT instance. See the [oscar-colony PyRAT docs](https://oscar-api.neuroinformatics.dev/) for how to create the required tokens.
 
 Now when you start the app with the usual commands, data from PyRAT will be used.
 If you want to swap back to the dev data at any time, you can set `COLONY_SOFTWARE=DEV` in the `.colony` file.
