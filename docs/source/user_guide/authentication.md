@@ -1,7 +1,7 @@
 # Authentication
 
 We use [django-allauth](https://docs.allauth.org/en/latest/) for authentication. Currently, the app is setup for 
-authentication via microsoft entra id, but allauth can support a wide variety of providers (see [allauth's provider docs](https://docs.allauth.org/en/latest/socialaccount/providers/index.html)).
+authentication via Microsoft Entra ID, but allauth can support a wide variety of providers (see [allauth's provider docs](https://docs.allauth.org/en/latest/socialaccount/providers/index.html)).
 
 ## .auth file
 
