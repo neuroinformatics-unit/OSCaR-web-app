@@ -1,4 +1,4 @@
-name: CI
+name: tests
 
 # Enable Buildkit and let compose use it to speed up image building
 env:
@@ -19,22 +19,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  linter:
+  linting:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code Repository
-        uses: actions/checkout@v7
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version-file: '.python-version'
-      # Consider using pre-commit.ci for open source project
-      - name: Run pre-commit
-        uses: pre-commit/action@v3.0.1
+      - uses: neuroinformatics-unit/actions/lint@v2
 
   # With no caching at all the entire ci process takes 3m to complete!
-  pytest:
+  test:
+    needs: [linting]
     runs-on: ubuntu-latest
 
     steps:
@@ -56,16 +48,6 @@ jobs:
             django.cache-to=type=gha,scope=django-cached-tests,mode=max
             postgres.cache-from=type=gha,scope=postgres-cached-tests
             postgres.cache-to=type=gha,scope=postgres-cached-tests,mode=max
-
-      - name: Build and cache docs
-        uses: docker/bake-action@v7
-        with:
-          push: false
-          load: true
-          files: docker-compose.docs.yml
-          set: |
-            docs.cache-from=type=gha,scope=cached-docs
-            docs.cache-to=type=gha,scope=cached-docs,mode=max
 
       - name: Check DB Migrations
         run: docker compose -f docker-compose.local.yml run --rm django python manage.py makemigrations --check
