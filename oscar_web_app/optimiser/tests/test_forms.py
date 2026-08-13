@@ -111,6 +111,23 @@ def test_valid_genotype_formsets(formset_data, mutation_names):
             "All genotypes must be unique",
             id="1 mutation - duplicate genotypes",
         ),
+        pytest.param(
+            {
+                "form-TOTAL_FORMS": 2,
+                "form-INITIAL_FORMS": 0,
+                "form-MIN_NUM_FORMS": 1,
+                "form-MAX_NUM_FORMS": 1000,
+                "form-0-Mut-A": "WT",
+                "form-0-Mut-B": "HET",
+                "form-0-count": 5,
+                "form-1-Mut-A": "WT",
+                "form-1-Mut-B": "HET",
+                "form-1-count": 10,
+            },
+            ["Mut-A"],
+            "All genotypes must be unique",
+            id="2 mutations - duplicate genotypes",
+        ),
     ],
 )
 def test_invalid_genotype_formsets(formset_data, mutation_names, expected_msg):
