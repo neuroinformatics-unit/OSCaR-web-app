@@ -2,6 +2,16 @@ import pytest
 from pytest_django.asserts import assertFormSetError
 
 from oscar_web_app.optimiser.forms import GenotypeFormSet
+from oscar_web_app.optimiser.forms import LineForm
+
+
+def test_line_form():
+    """Test line form correctly populates choices from the colony software."""
+
+    line_form = LineForm()
+    choices = dict(line_form.fields["line"].choices)
+
+    assert choices == {"": "--------", 1: "Line-A", 2: "Line-AB", 3: "Line-ABC"}
 
 
 @pytest.mark.parametrize(

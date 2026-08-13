@@ -14,13 +14,6 @@ from oscar_web_app.optimiser.views import select_genotypes
 # ruff: noqa: PLR2004
 
 
-@pytest.fixture(autouse=True)
-def colony_software_dev(settings):
-    """Force use of the DEV colony software"""
-
-    settings.COLONY_SOFTWARE = "DEV"
-
-
 @pytest.fixture
 def logged_in_client(client, django_user_model):
     user = django_user_model.objects.create_user(
