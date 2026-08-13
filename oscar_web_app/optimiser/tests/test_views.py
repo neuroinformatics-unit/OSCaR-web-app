@@ -11,6 +11,8 @@ from oscar_web_app.optimiser.forms import GenotypeFormSet
 from oscar_web_app.optimiser.forms import LineForm
 from oscar_web_app.optimiser.views import select_genotypes
 
+# ruff: noqa: PLR2004
+
 
 @pytest.fixture(autouse=True)
 def colony_software_dev(settings):
@@ -78,3 +80,43 @@ def test_select_line_with_no_mutations(rf, mocker):
 
     with assertRaisesMessage(Http404, "No mutations found for chosen line"):
         select_genotypes(request, line_id=1)
+
+
+def test_select_genotypes_post(logged_in_client):
+    line_id = 1
+
+    # Submit a form for WT=5 and HET=10
+    response = logged_in_client.post(
+        reverse("optimiser:select_genotypes", args=[line_id]),
+        {
+            "form-TOTAL_FORMS": 2,
+            "form-INITIAL_FORMS": 0,
+            "form-MIN_NUM_FORMS": 1,
+            "form-MAX_NUM_FORMS": 1000,
+            "form-0-Mut-A": "WT",
+            "form-0-count": 5,
+            "form-1-Mut-A": "HET",
+            "form-1-count": 10,
+        },
+    )
+
+    assert response.status_code == HTTPStatus.OK
+
+    assertTemplateUsed(response=response, template_name="optimiser/result.html")
+
+    # Line stats context
+    assert response.context["line_name"] == "Line-A"
+    assert response.context["mutations"] == ["Mut-A"]
+    assert response.context["stats_total_n"] == 18
+    assert response.context["stats_genotyped_n"] == 18
+    assert response.context["stats_matings_n"] == 9
+    assert response.context["stats_litter_size"] == 2
+
+    # optimisation result context
+    assert response.context["total_n"] == 16.66
+    assert response.context["total_surplus"] == 1.66
+    assert response.context["required_n"] == 15
+
+    # TODO - stats_genotype_table, stats_scheme_summary_table,
+    # stats_scheme_number_table, stats_scheme_proportion_table, scheme_table,
+    # surplus_genotype_table
