@@ -77,6 +77,9 @@ def test_valid_genotype_formsets(formset_data, mutation_names):
         form_kwargs={"mutation_names": mutation_names},
     )
     assert formset.is_valid()
+    assert sorted(formset[0].fields.keys()) == sorted(
+        ["DELETE", "count", *mutation_names]
+    )
 
 
 @pytest.mark.parametrize(
