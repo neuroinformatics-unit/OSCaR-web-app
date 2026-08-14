@@ -60,19 +60,19 @@ class ColonyManagement(ABC):
 
     @abstractmethod
     def get_lines(self) -> Iterator[pd.DataFrame]:
-        pass
+        """Get names and ids of available lines"""
 
     @abstractmethod
     def get_line_name(self, line_id: int) -> str:
-        pass
+        """Get name of a line from its id"""
 
     @abstractmethod
     def get_line_mutations(self, line_id: int) -> list[str]:
-        pass
+        """Get names of mutations for the given line"""
 
     @abstractmethod
     def get_line_stats(self, line_name: str) -> LineStatistics:
-        pass
+        """Get historical stats for the given line"""
 
     def optimise_schemes(
         self, line_stats: LineStatistics, genotype_formset: GenotypeFormSet

@@ -119,3 +119,16 @@ def test_pyrat_colony_mutations(mocker):
     assert mocked_func.call_count == 1
     assert mocked_func.call_args == ((line_id,),)
     assert line_name == mocked_mutations
+
+
+@pytest.mark.usefixtures("colony_software_pyrat")
+def test_line_stats_no_animals(mocker):
+
+    mocker.patch(
+        "oscar_web_app.optimiser.colony_management.get_pyrat_data",
+        return_value=[pd.DataFrame()],
+    )
+
+    error_msg = "No animals found for chosen line"
+    with pytest.raises(Http404, match=error_msg):
+        get_colony().get_line_stats("TEST-LINE")
