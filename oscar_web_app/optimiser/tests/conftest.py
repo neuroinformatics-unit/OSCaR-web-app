@@ -1,8 +1,8 @@
 import pytest
 
 
-@pytest.fixture(autouse=True)
-def colony_software_dev(settings):
-    """Force use of the DEV colony software"""
+@pytest.fixture
+def colony_software_pyrat(settings):
+    """Use the PYRAT colony software"""
 
-    settings.COLONY_SOFTWARE = "DEV"
+    settings.COLONY_SOFTWARE = "PYRAT"

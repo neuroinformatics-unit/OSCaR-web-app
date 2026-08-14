@@ -110,6 +110,8 @@ We use [`pytest`](https://docs.pytest.org/en/stable/) with [`pytest-django`](htt
 
 Tests that are specific to a particular app, go inside that directory e.g. `oscar_web_app/optimiser/tests` or `oscar_web_app/users/tests`. Tests that aren't for a particular app, go in the top-level `tests/` directory.
 
+Tests default to using fake data from `COLONY_SOFTWARE=DEV` (set in the test specific django settings at `config/settings/test.py`). This can be overridden by adding e.g. `@pytest.mark.usefixtures("colony_software_pyrat")` to use `COLONY_SOFTWARE=PYRAT`.
+
 Run the tests locally with:
 ```bash
 # Creates a temporary container to run the tests, then removes it when complete
