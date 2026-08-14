@@ -1,5 +1,6 @@
 import re
 
+import pandas as pd
 import pytest
 from django.http import Http404
 from oscar_colony.historical_stats import LineStatistics
@@ -61,11 +62,60 @@ def test_optimise_invalid_scheme():
 
 
 @pytest.mark.usefixtures("colony_software_pyrat")
-def test_get_pyrat_lines(mocker):
-    mocker.patch(
-        "oscar_web_app.optimiser.colony_management.ColonyPyRAT.get_lines",
-        return_value=["Line-A", "Line-B"],
+def test_pyrat_colony_lines(mocker):
+
+    # Mock get_pyrat_lines, to avoid calling the real PyRAT API
+    mocked_lines = [pd.DataFrame({"name": ["Line-P1", "Line-P2"], "id": [5, 6]})]
+    mocked_func = mocker.patch(
+        "oscar_web_app.optimiser.colony_management.get_pyrat_lines",
+        return_value=mocked_lines,
     )
 
-    # check called once
-    get_colony().get_lines()
+    lines = get_colony().get_lines()
+
+    # Check it called the PyRAT function once, and returned the value unchanged
+    assert mocked_func.call_count == 1
+    assert len(lines) == 1
+    pd.testing.assert_frame_equal(lines[0], mocked_lines[0])
+
+
+@pytest.mark.usefixtures("colony_software_pyrat")
+def test_pyrat_colony_name(mocker):
+
+    line_id = 5
+
+    # Mock get_pyrat_line_name, to avoid calling the real PyRAT API
+    mocked_name = "Line-P1"
+    mocked_func = mocker.patch(
+        "oscar_web_app.optimiser.colony_management.get_pyrat_line_name",
+        return_value=mocked_name,
+    )
+
+    line_name = get_colony().get_line_name(line_id=line_id)
+
+    # Check it called the PyRAT function once, with the right line id,
+    # and returned the value unchanged
+    assert mocked_func.call_count == 1
+    assert mocked_func.call_args == ((line_id,),)
+    assert line_name == mocked_name
+
+
+@pytest.mark.usefixtures("colony_software_pyrat")
+def test_pyrat_colony_mutations(mocker):
+
+    line_id = 5
+
+    # Mock get_pyrat_line_name, to avoid calling the real PyRAT API
+    mocked_mutations = ["Mut-X", "Mut-Y"]
+    mocked_func = mocker.patch(
+        "oscar_web_app.optimiser.colony_management.get_pyrat_line_mutations",
+        return_value=mocked_mutations,
+    )
+
+    line_name = get_colony().get_line_mutations(line_id=line_id)
+
+    # Check it called the PyRAT function once, with the right line id,
+    # and returned the value unchanged
+    assert mocked_func.call_count == 1
+    assert mocked_func.call_args == ((line_id,),)
+    assert line_name == mocked_mutations

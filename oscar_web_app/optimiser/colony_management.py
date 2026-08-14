@@ -131,10 +131,9 @@ class ColonyPyRAT(ColonyManagement):
 
     def get_lines(self) -> Iterator[pd.DataFrame]:
         """Get names and ids of available lines"""
-
         return get_pyrat_lines()
 
-    def get_line_name(self, line_id: int) -> int:
+    def get_line_name(self, line_id: int) -> str:
         return get_pyrat_line_name(line_id)
 
     def get_line_mutations(self, line_id: int) -> list[str]:
