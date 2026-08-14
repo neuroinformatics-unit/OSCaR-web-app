@@ -129,35 +129,15 @@ pytest
 
 ## Test coverage
 
-To view test coverage locally, you can run:
+To view test coverage locally, use the same commands as above ([tests section](#tests)) with the `--cov`
+option. For example:
 ```bash
-# Creates a temporary container to run coverage, then removes it when complete
-docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml run --rm django coverage run -m pytest
+docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml run --rm django pytest --cov
 ```
-This will create a `.coverage` file at the top level of the repository.
+This will print a summary of coverage per file at the end of the `pytest` results, and create
+a `.coverage` file at the top level of the repository.
 
-To see a summary of coverage per file run:
-```bash
-docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml run --rm django coverage report
-```
-Or for an html summary:
-```bash
-docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml run --rm django coverage html
-```
-This will produce an `htmlcov` folder at the top level of the repository. Open the `index.html` file inside to view coverage results in your browser.
-
-If you'd prefer to run coverage inside an already running container, you can run:
-```bash
-# Enter a bash terminal inside the running django container
-docker exec -it oscar_web_app_local_django bash
-
-# Source some required env variables like DATABASE_URL, and make sure failures won't exit the bash terminal
-source /entrypoint && set +euo pipefail
-
-coverage run -m pytest
-coverage report
-coverage html
-```
+To produce an html summary, use `--cov --cov-report=html`. This will produce an `htmlcov` folder at the top level of the repository. Open the `index.html` file inside to view coverage results in your browser.
 
 ## Building the docs locally
 
