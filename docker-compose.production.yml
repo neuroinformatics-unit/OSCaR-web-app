@@ -24,7 +24,7 @@ services:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
       - ./.envs/.production/.colony
-      - ./envs/.production/.auth
+      - ./.envs/.production/.auth
     command: /start
 
   postgres:
