@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Calculate schemes{% endblock title %}
+{% block content %}
+  <h1 class="my-4">Optimisation results</h1>
+  {% comment %} Line summary details {% endcomment %}
+  <h2 class="my-3">Line details</h2>
+  <div class="row align-items-center">
+    <div class="col-xxl-1 col-md-2 col-sm-3 border-end">
+      <p class="fw-bold my-2">Name:</p>
+    </div>
+    <div class="col-auto">
+      <p class="my-2">{{ line_name }}</p>
+    </div>
+  </div>
+  <div class="row align-items-center">
+    <div class="col-xxl-1 col-md-2 col-sm-3 border-end">
+      <p class="fw-bold my-2">Mutations:</p>
+    </div>
+    <div class="col-auto">
+      <p class="my-2">{{ mutations | join:", " }}</p>
+    </div>
+  </div>
+  {% comment %} Tabs for the optimal schemes information {% endcomment %}
+  <h2 class="my-3">Optimal schemes</h2>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active"
+              id="scheme-summary-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#scheme-summary-tab-pane"
+              type="button"
+              role="tab"
+              aria-controls="scheme-summary-tab-pane"
+              aria-selected="true">Overall summary</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link"
+              id="scheme-genotype-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#scheme-genotype-tab-pane"
+              type="button"
+              role="tab"
+              aria-controls="scheme-genotype-tab-pane"
+              aria-selected="false">Summary by genotype</button>
+    </li>
+  </ul>
+  <div class="tab-content">
+    {% comment %} Optimal scheme summary tab content {% endcomment %}
+    <div class="tab-pane fade show active"
+         id="scheme-summary-tab-pane"
+         role="tabpanel"
+         aria-labelledby="scheme-summary-tab"
+         tabindex="0">
+      <div class="row justify-content-center my-4">
+        <div class="col-auto">{{ scheme_table | safe }}</div>
+        <div class="col-md-4">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Required total: {{ required_n }}</li>
+            <li class="list-group-item">Expected total: {{ total_n }}</li>
+            <li class="list-group-item">Expected surplus: {{ total_surplus }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% comment %} Optimal scheme genotype tab content {% endcomment %}
+    <div class="tab-pane fade"
+         id="scheme-genotype-tab-pane"
+         role="tabpanel"
+         aria-labelledby="scheme-genotype-tab"
+         tabindex="0">
+      <div class="row justify-content-center my-4">
+        <div class="col-md-8 table-responsive">{{ surplus_genotype_table | safe }}</div>
+      </div>
+    </div>
+    {% comment %} Tabs for the historical statistics information {% endcomment %}
+    <h2 class="mb-3">Historical statistics for the line</h2>
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active"
+                id="stats-line-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#stats-line-tab-pane"
+                type="button"
+                role="tab"
+                aria-controls="stats-line-tab-pane"
+                aria-selected="true">By Line</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link"
+                id="stats-genotype-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#stats-genotype-tab-pane"
+                type="button"
+                role="tab"
+                aria-controls="stats-genotype-tab-pane"
+                aria-selected="false">By Genotype</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link"
+                id="stats-scheme-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#stats-scheme-tab-pane"
+                type="button"
+                role="tab"
+                aria-controls="stats-scheme-tab-pane"
+                aria-selected="false">By Scheme</button>
+      </li>
+    </ul>
+    <div class="tab-content">
+      {% comment %} Historical stats by line tab content {% endcomment %}
+      <div class="tab-pane fade show active"
+           id="stats-line-tab-pane"
+           role="tabpanel"
+           aria-labelledby="stats-line-tab"
+           tabindex="0">
+        <ul class="list-group list-group-flush my-4">
+          <li class="list-group-item">Total offspring: {{ stats_total_n }}</li>
+          <li class="list-group-item">Total genotyped offspring: {{ stats_genotyped_n }}</li>
+          <li class="list-group-item">Total successful matings: {{ stats_matings_n }}</li>
+          <li class="list-group-item">Average litter size: {{ stats_litter_size }}</li>
+        </ul>
+      </div>
+      {% comment %} Historical stats by genotype tab content {% endcomment %}
+      <div class="tab-pane fade"
+           id="stats-genotype-tab-pane"
+           role="tabpanel"
+           aria-labelledby="stats-genotype-tab"
+           tabindex="0">
+        <row class="row justify-content-center my-4">
+        <div class="col-md-8 table-responsive">{{ stats_genotype_table | safe }}</div>
+        </row>
+      </div>
+      {% comment %} Historical stats by scheme tab content {% endcomment %}
+      <div class="tab-pane fade"
+           id="stats-scheme-tab-pane"
+           role="tabpanel"
+           aria-labelledby="stats-scheme-tab"
+           tabindex="0">
+        <h3 class="my-4">Overall stats per scheme</h3>
+        <div class="table-responsive">{{ stats_scheme_summary_table | safe }}</div>
+        <h3 class="my-4">Number of offspring per scheme</h3>
+        <div class="table-responsive">{{ stats_scheme_number_table | safe }}</div>
+        <h3 class="my-4">Proportion of offspring per scheme</h3>
+        <div class="table-responsive">{{ stats_scheme_proportion_table | safe }}</div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

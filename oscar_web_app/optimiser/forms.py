@@ -10,9 +10,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import BaseFormSet
 from django.forms import formset_factory
-from oscar_colony.breeding_scheme import Genotype
 
-from .colony_management import ColonyManagement
+from .colony_management import get_colony
 
 
 def _fetch_line_choices():
@@ -21,7 +20,7 @@ def _fetch_line_choices():
     # Start with an empty default choice
     lines = [("", "--------")]
 
-    for line_df in ColonyManagement().get_lines():
+    for line_df in get_colony().get_lines():
         if not line_df.empty:
             lines.extend(
                 [(row.id, row.name) for row in line_df.itertuples(index=False)]
@@ -70,11 +69,12 @@ class GenotypeForm(forms.Form):
         # mutations is a kwarg
         for mutation_name in mutation_names:
             self.fields[mutation_name] = forms.ChoiceField(
+                label=mutation_name,
                 choices=(
-                    (Genotype.WT, "WT"),
-                    (Genotype.HET, "HET"),
-                    (Genotype.HOM, "HOM"),
-                )
+                    ("WT", "WT"),
+                    ("HET", "HET"),
+                    ("HOM", "HOM"),
+                ),
             )
 
         self.helper = FormHelper()

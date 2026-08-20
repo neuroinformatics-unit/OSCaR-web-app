@@ -6,6 +6,8 @@ from pathlib import Path
 
 import environ
 
+from oscar_web_app.optimiser.colony_management import ColonySoftware
+
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # oscar_web_app/
 APPS_DIR = BASE_DIR / "oscar_web_app"
@@ -357,5 +359,19 @@ REQUIRED_APP_ROLE = env("REQUIRED_APP_ROLE", default="")
 INSTALLED_APPS += ["compressor"]
 STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
 
-# Your stuff...
+# oscar specific
 # ------------------------------------------------------------------------------
+
+# Set which colony software to pull data from
+COLONY_SOFTWARE = env("COLONY_SOFTWARE", default="DEV")
+if COLONY_SOFTWARE not in ColonySoftware:
+    msg = (
+        f"COLONY_SOFTWARE should be set to one of "
+        f"{[software.name for software in ColonySoftware]}"
+    )
+    raise NotImplementedError(msg)
+
+# Check required env variables are set if PYRAT is selected option
+if COLONY_SOFTWARE == ColonySoftware.PYRAT:
+    for env_name in ["PYRAT_URL", "PYRAT_CLIENT_TOKEN", "PYRAT_USER_TOKEN"]:
+        env(env_name)  # raises ImproperlyConfigured exception if not found
