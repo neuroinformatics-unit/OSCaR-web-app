@@ -10,7 +10,7 @@ If you are already familiar with setting up an EC2 instance, you can skip to the
 
 ### VPC
 
-First, we set up a [VPC](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) to allow access from the internet to our app.
+First, we set up a [VPC](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) for our app.
 
 - In the AWS console, search for 'VPC'
 - Click 'Create VPC'
@@ -131,7 +131,7 @@ sudo systemctl start containerd
 - See the [colony docs](./colony_management) for details of how to setup the `.colony` file
 
 You will also need to create a `.envs/.production/.django` file similar to below.
-Everything inside `<>` needs to be replaced with your own values.
+Everything inside `< >` needs to be replaced with your own values.
 ```
 # General
 # ------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ CELERY_FLOWER_PASSWORD=<Set to a long random string>
 ```
 
 A `.envs/.production/.postgres` file is also required like below. 
-Everything inside `<>` needs to be replaced with your own values.
+Everything inside `< >` needs to be replaced with your own values.
 ```
 # PostgreSQL
 # ------------------------------------------------------------------------------
