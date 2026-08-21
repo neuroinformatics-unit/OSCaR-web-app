@@ -4,9 +4,11 @@ In this section, we walk through deploying the app for production. This guide us
 
 You will need an AWS account to follow the steps below - bear in mind AWS is a paid service and will incur monthly charges.
 
+If you are already familiar with setting up an EC2 instance, you can skip to the [installation section](#installation).
+
 ## Create the server
 
-### VPC-related
+### VPC
 
 First, we set up a [VPC](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) to allow access from the internet to our app.
 
@@ -23,7 +25,6 @@ Next, create a [subnet](https://docs.aws.amazon.com/vpc/latest/userguide/configu
 - Click 'create subnet'
 - Select the VPC you created in the last step
 - Give the subnet an appropriate name (e.g. oscar-subnet), and enter the same CIDR value you used earlier into `IPv4 subnet CIDR block`
-then 'Create subnet'
 
 ### Internet gateway
 
@@ -79,14 +80,117 @@ Finally, we assign an IP address to the EC2 instance.
 - Once created, select the checkbox next to it, then 'Actions > Associate elastic IP address'.
 - Then choose resource type: instance, and select the EC2 instance we made in the last step.
 
+You will need to make a DNS record associating this IP address with the domain name you want to deploy the website at.
+
 ## Installation
+
+SSH into the EC2 instance with `ssh ubuntu@IP-ADDRESS`, where you replace `IP-ADDRESS` with the elastic IP you assigned earlier.
 
 ### Docker
 
-Install [Docker](https://www.docker.com/) by following the instructions for your operating system.
+Install [Docker](https://www.docker.com/) on the VM by following the instructions in [the Docker docs](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository).
 
-Make sure [docker compose](https://docs.docker.com/compose/) is available. Depending on your Docker installation method, you may have to install this separately.
+Follow the [manage docker as a non-root user docs](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user) to allow running docker commands without `sudo`.
+
+### Mount volumes
+
+Mount any extra EBS volumes you created during the [EC2 creation step](#create-the-instance). Follow the [AWS mounting docs](https://docs.aws.amazon.com/ebs/latest/userguide/ebs-using-volumes.html)
+
+### Update default Docker storage location
+
+If you created an additional EBS volume during the [EC2 creation step](#create-the-instance), you will probably want to set Docker to store its files there.
+
+- Stop Docker and containerd
+```bash
+sudo systemctl stop docker
+sudo systemctl stop containerd
+sudo rsync -aHAX /var/lib/containerd/ /data/containerd/
+sudo rm -rf /var/lib/containerd/
+```
+
+- Change `/etc/docker/daemon.json` (or create it) to contain:
+```json
+{"data-root": "/data/docker"}
+```
+
+- Change `/etc/containerd/config.toml`:
+```toml
+root = "/data/containerd"
+state = "/run/containerd"
+```
+
+- Restart docker and containerd
+```bash
+sudo systemctl start docker
+sudo systemctl start containerd
+```
 
 ## Setting up `.envs/.production` files
 
+- See the [authentication docs](./authentication) for details on how to setup the `.auth` file.
+- See the [colony docs](./colony_management) for details of how to setup the `.colony` file
+
+You will also need to create a `.envs/.production/.django` file similar to below.
+Everything inside `<>` needs to be replaced with your own values.
+```
+# General
+# ------------------------------------------------------------------------------
+DJANGO_SETTINGS_MODULE=config.settings.production
+DJANGO_SECRET_KEY=<set to a long random string>
+DJANGO_ADMIN_URL=<url you want your admin interface to appear at>
+DJANGO_ALLOWED_HOSTS=<enter the domain name you host the website at>
+
+# Security
+# ------------------------------------------------------------------------------
+DJANGO_SECURE_SSL_REDIRECT=False
+
+# Redis
+# ------------------------------------------------------------------------------
+REDIS_URL=redis://redis:6379/0
+
+# Celery
+# ------------------------------------------------------------------------------
+
+# Flower
+CELERY_FLOWER_USER=<Set to a random string>
+CELERY_FLOWER_PASSWORD=<Set to a long random string>
+```
+
+A `.envs/.production/.postgres` file is also required like below. 
+Everything inside `<>` needs to be replaced with your own values.
+```
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=oscar_web_app
+POSTGRES_USER=<set to a random string>
+POSTGRES_PASSWORD=<set to a long random string>
+```
+
+## Domain name
+
+Before running the app, you will have to update any references in the codebase to `oscar.neuroinformatics.dev` to your chosen domain. For example, in `traefik.yml`.
+
 ## Running the app
+
+Build the app:
+```bash
+docker compose -f docker-compose.production.yml -f docker-compose.no-celery.yml build
+```
+
+Run the app:
+```bash
+docker compose -f docker-compose.production.yml -f docker-compose.no-celery.yml up
+```
+
+Go to your chosen domain in the browser, and you should see the website.
+
+To stop the app:
+```bash
+docker compose -f docker-compose.production.yml -f docker-compose.no-celery.yml down
+```
+
+**Note**: if you change values in your `.envs` files, you will need to stop and re-start the app to see the effects. If you change the app's dependencies, then you will also need to re-build it.
+
+
