@@ -3,9 +3,11 @@
 We use [django-allauth](https://docs.allauth.org/en/latest/) for authentication. Currently, the app is setup for 
 authentication via Microsoft Entra ID, but allauth can support a wide variety of providers (see [allauth's provider docs](https://docs.allauth.org/en/latest/socialaccount/providers/index.html)).
 
+This file covers authentication setup for running the app locally (for testing purposes) and also for a production deployment.
+
 ## .auth file
 
-First, make a placeholder file at `.envs/.local/.auth` like so:
+First, make a placeholder file at `.envs/.local/.auth` (for running locally) or `.envs/.production/.auth` (for a production deployment) like so:
 ```
 AZURE_TENANT_ID=
 CLIENT_ID=
@@ -22,10 +24,11 @@ We'll fill in these values later.
 
 - Under 'App registrations' click 'New registration'.
 
-- For a local development setup, set:
-  - The name however you like e.g. 'oscar-local'
+- Then set:
+  - The name however you like e.g. 'oscar-local' or 'oscar-production'
   - The supported account type. If you want it to be specific to your institution, there should be an option like 'Single tenant only...'
-  - Set the redirect URI as: `Web` : `http://localhost:8000/accounts/oidc/microsoft/login/callback/`
+  - For local, set the redirect URI as: `Web` : `http://localhost:8000/accounts/oidc/microsoft/login/callback/`
+  - For production, set the redirect URI as: `Web`: `https://DOMAIN/accounts/oidc/microsoft/login/callback/`, where you replace 'DOMAIN' with the domain you host the OSCaR website at
 
 - On the overview that gets shown after creation, find:
   - `Directory (tenant) ID` and copy the value into your `.auth` file next to `AZURE_TENANT_ID=`
@@ -49,7 +52,7 @@ Copy the value you set into your `.auth` file next to `REQUIRED_APP_ROLE=`
 ## Assign the app role
 
 Go back to the top level of `Microsoft Entra ID` and select `Enterprise applications`. 
-- Search for the app you registered in the previous step e.g. oscar-local, and click on it.
+- Search for the app you registered in the previous step e.g. oscar-local / oscar-production, and click on it.
 - Go the `Manage > Users and groups` section, then `Add user/group`
 - Here you can select individual users or groups to give permissions to access the app (make sure the role you created in the last section is selected under 'Select a role')
 
