@@ -184,6 +184,11 @@ Run the app:
 docker compose -f docker-compose.production.yml -f docker-compose.no-celery.yml up
 ```
 
+The first time you run the app, you will also need to run `migrate` to setup the database:
+```bash
+docker compose -f docker-compose.production.yml -f docker-compose.no-celery.yml run --rm django python manage.py migrate
+```
+
 Go to your chosen domain in the browser, and you should see the website.
 
 To stop the app:
