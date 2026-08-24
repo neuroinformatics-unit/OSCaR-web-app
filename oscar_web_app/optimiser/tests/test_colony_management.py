@@ -173,3 +173,18 @@ def test_line_stats(pyrat_csv_name, line_name, mocker):
     expected_stats = ColonyDev().get_line_stats(line_name)
 
     assert_dataclass_equal(line_stats, expected_stats)
+
+
+@pytest.mark.usefixtures("colony_software_pyrat")
+def test_line_stats_all_filtered(mocker):
+    """Test that 404 is raised when no rows remain after standardisation"""
+
+    animal_data = pd.read_csv(pooch_data_path("pyrat-data-all-forbidden.csv"))
+    mocker.patch(
+        "oscar_web_app.optimiser.colony_management.get_pyrat_data",
+        return_value=[animal_data],
+    )
+
+    error_msg = "No animals remain for chosen line after standardisation"
+    with pytest.raises(Http404, match=error_msg):
+        get_colony().get_line_stats("Line-AB")
