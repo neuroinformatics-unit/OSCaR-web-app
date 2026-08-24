@@ -31,21 +31,27 @@ def test_select_line_get(logged_in_client):
     assertTemplateUsed(response=response, template_name="optimiser/select_line.html")
 
 
-def test_select_line_post(logged_in_client):
+@pytest.mark.parametrize(
+    ("line_id", "line_name"),
+    [(1, "Line-A"), (2, "Line-AB"), (3, "Line-ABC")],
+)
+def test_select_line_post(logged_in_client, line_id, line_name):
 
-    line_id = 1
     assert line_id not in logged_in_client.session
 
     response = logged_in_client.post(
         reverse("optimiser:select_line"), {"line": line_id}
     )
 
-    assert logged_in_client.session[str(line_id)] == "Line-A"
+    assert logged_in_client.session[str(line_id)] == line_name
     assertRedirects(response, reverse("optimiser:select_genotypes", args=[line_id]))
 
 
-def test_select_genotypes_get(logged_in_client):
-    line_id = 1
+@pytest.mark.parametrize(
+    ("line_id", "mutations"),
+    [(1, ["Mut-A"]), (2, ["Mut-A", "Mut-B"]), (3, ["Mut-A", "Mut-B", "Mut-C"])],
+)
+def test_select_genotypes_get(logged_in_client, line_id, mutations):
 
     response = logged_in_client.get(
         reverse("optimiser:select_genotypes", args=[line_id])
@@ -55,7 +61,7 @@ def test_select_genotypes_get(logged_in_client):
     formset = response.context["formset"]
     assert isinstance(formset, GenotypeFormSet)
     assert len(formset) == 1
-    assert sorted(formset[0].fields.keys()) == ["DELETE", "Mut-A", "count"]
+    assert sorted(formset[0].fields.keys()) == ["DELETE", *mutations, "count"]
 
     assertTemplateUsed(
         response=response, template_name="optimiser/select_genotypes.html"
