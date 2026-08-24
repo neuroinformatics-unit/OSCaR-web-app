@@ -53,6 +53,7 @@ dev = [
   "djlint==1.39.2",
   "factory-boy==3.3.3",
   "ipdb==0.13.13",
+  "lxml==6.1.2",
   "mypy==2.1.0",
   "pooch==1.9.0",
   "pre-commit==4.6.0",

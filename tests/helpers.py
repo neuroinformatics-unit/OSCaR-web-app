@@ -1,7 +1,9 @@
 from collections.abc import Mapping
 from dataclasses import asdict
+from io import StringIO
 from typing import Any
 
+import pandas as pd
 import pytest
 
 
@@ -73,3 +75,31 @@ def _assert_close(
         assert actual == pytest.approx(expected, abs=abs_tolerance), message
     else:
         assert actual == expected, message
+
+
+def convert_html_table_to_df(
+    html_str: str, *, numeric_as_float: bool = False
+) -> pd.DataFrame:
+    """
+    Convert an HTML table string to a pandas DataFrame.
+
+    Parameters
+    ----------
+    html_str : str
+        The HTML string containing a table
+    numeric_as_float : bool, optional
+        When True, forces all numeric columns to have a float dtype.
+
+    Returns
+    -------
+    pd.DataFrame
+        The converted pandas DataFrame
+    """
+
+    df = pd.read_html(StringIO(html_str))[0]
+
+    if numeric_as_float:
+        numeric_cols = df.select_dtypes(include="number").columns
+        df[numeric_cols] = df[numeric_cols].astype(float)
+
+    return df

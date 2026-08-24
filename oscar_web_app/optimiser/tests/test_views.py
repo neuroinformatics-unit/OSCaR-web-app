@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+import pandas as pd
 import pytest
 from django.http import Http404
 from django.urls import reverse
@@ -7,9 +8,11 @@ from pytest_django.asserts import assertRaisesMessage
 from pytest_django.asserts import assertRedirects
 from pytest_django.asserts import assertTemplateUsed
 
+from oscar_web_app.optimiser.colony_management import get_colony
 from oscar_web_app.optimiser.forms import GenotypeFormSet
 from oscar_web_app.optimiser.forms import LineForm
 from oscar_web_app.optimiser.views import select_genotypes
+from tests.helpers import convert_html_table_to_df
 
 # ruff: noqa: PLR2004
 
@@ -25,6 +28,8 @@ def logged_in_client(client, django_user_model):
 
 
 def test_select_line_get(logged_in_client):
+    """Test the select line form is shown on GET"""
+
     response = logged_in_client.get(reverse("optimiser:select_line"))
     assert response.status_code == HTTPStatus.OK
     assert isinstance(response.context["form"], LineForm)
@@ -36,6 +41,7 @@ def test_select_line_get(logged_in_client):
     [(1, "Line-A"), (2, "Line-AB"), (3, "Line-ABC")],
 )
 def test_select_line_post(logged_in_client, line_id, line_name):
+    """Test POST with specific line ids, saves the correct line name"""
 
     assert line_id not in logged_in_client.session
 
@@ -52,6 +58,7 @@ def test_select_line_post(logged_in_client, line_id, line_name):
     [(1, ["Mut-A"]), (2, ["Mut-A", "Mut-B"]), (3, ["Mut-A", "Mut-B", "Mut-C"])],
 )
 def test_select_genotypes_get(logged_in_client, line_id, mutations):
+    """Test select genotypes form is shown with correct mutations."""
 
     response = logged_in_client.get(
         reverse("optimiser:select_genotypes", args=[line_id])
@@ -69,6 +76,7 @@ def test_select_genotypes_get(logged_in_client, line_id, mutations):
 
 
 def test_select_line_with_no_mutations(rf, mocker):
+    """Test that the absence of mutations triggers a 404 response."""
 
     mocker.patch(
         "oscar_web_app.optimiser.colony_management.ColonyDev.get_line_mutations",
@@ -100,16 +108,41 @@ def test_select_genotypes_post(logged_in_client):
     )
 
     assert response.status_code == HTTPStatus.OK
-
     assertTemplateUsed(response=response, template_name="optimiser/result.html")
 
+    # Values should match those in the given line stats
+    line_stats = get_colony().get_line_stats("Line-A")
+
     # Line stats context
-    assert response.context["line_name"] == "Line-A"
-    assert response.context["mutations"] == ["Mut-A"]
-    assert response.context["stats_total_n"] == 18
-    assert response.context["stats_genotyped_n"] == 18
-    assert response.context["stats_matings_n"] == 9
-    assert response.context["stats_litter_size"] == 2
+    assert response.context["line_name"] == line_stats.line_name
+    assert response.context["mutations"] == line_stats.mutations
+    assert response.context["stats_total_n"] == line_stats.total_n_offspring
+    assert (
+        response.context["stats_genotyped_n"] == line_stats.total_n_genotyped_offspring
+    )
+    assert response.context["stats_matings_n"] == line_stats.total_n_successful_matings
+    assert response.context["stats_litter_size"] == line_stats.average_litter_size
+
+    pd.testing.assert_frame_equal(
+        convert_html_table_to_df(response.context["stats_genotype_table"]),
+        line_stats.create_n_per_genotype_df(),
+    )
+    pd.testing.assert_frame_equal(
+        convert_html_table_to_df(response.context["stats_scheme_summary_table"]),
+        line_stats.create_scheme_summary_df(decimal_places=2).astype({"Scheme": "str"}),
+    )
+    pd.testing.assert_frame_equal(
+        convert_html_table_to_df(
+            response.context["stats_scheme_number_table"], numeric_as_float=True
+        ),
+        line_stats.create_scheme_number_df().astype({"Scheme": "str"}),
+    )
+    pd.testing.assert_frame_equal(
+        convert_html_table_to_df(response.context["stats_scheme_proportion_table"]),
+        line_stats.create_scheme_proportion_df(decimal_places=2).astype(
+            {"Scheme": "str"}
+        ),
+    )
 
     # optimisation result context
     assert response.context["total_n"] == 16.66
