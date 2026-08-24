@@ -141,6 +141,12 @@ a `.coverage` file at the top level of the repository.
 
 To produce an html summary, use `--cov --cov-report=html`. This will produce an `htmlcov` folder at the top level of the repository. Open the `index.html` file inside to view coverage results in your browser.
 
+## Test data
+
+Some test data is stored in the [oscar-test-data GIN repository](https://gin.swc.ucl.ac.uk/neuroinformatics/oscar-test-data), and fetched using [`pooch`](https://www.fatiando.org/pooch/latest/).
+
+If you add / update a test data file, you will need to update the file names and hashes in the pooch registry at `tests/pooch_registry.txt`. Hashes can be generated using [the instructions in poochs' docs](https://www.fatiando.org/pooch/latest/hashes.html#calculating-hashes).
+
 ## Building the docs locally
 
 To build the documentation locally, you will need to install some additional dependencies, then run `sphinx-build` (as below).

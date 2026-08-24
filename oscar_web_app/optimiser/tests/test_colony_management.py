@@ -9,6 +9,8 @@ from oscar_web_app.optimiser.colony_management import ColonyDev
 from oscar_web_app.optimiser.colony_management import ColonyPyRAT
 from oscar_web_app.optimiser.colony_management import get_colony
 from oscar_web_app.optimiser.forms import GenotypeFormSet
+from tests.helpers import assert_dataclass_equal
+from tests.pooch_test_data import pooch_data_path
 
 
 @pytest.mark.parametrize(
@@ -132,3 +134,42 @@ def test_line_stats_no_animals(mocker):
     error_msg = "No animals found for chosen line"
     with pytest.raises(Http404, match=error_msg):
         get_colony().get_line_stats("TEST-LINE")
+
+
+@pytest.mark.parametrize(
+    ("pyrat_csv_name", "line_name"),
+    [
+        pytest.param(
+            "pyrat-data-1-mutation.csv",
+            "Line-A",
+            id="1 mutation",
+        ),
+        pytest.param(
+            "pyrat-data-2-mutations.csv",
+            "Line-AB",
+            id="2 mutations",
+        ),
+        pytest.param(
+            "pyrat-data-3-mutations.csv",
+            "Line-ABC",
+            id="3 mutations",
+        ),
+    ],
+)
+@pytest.mark.usefixtures("colony_software_pyrat")
+def test_line_stats(pyrat_csv_name, line_name, mocker):
+
+    animal_data = pd.read_csv(pooch_data_path(pyrat_csv_name))
+    mocker.patch(
+        "oscar_web_app.optimiser.colony_management.get_pyrat_data",
+        return_value=[animal_data],
+    )
+
+    # Run pyrat get_line_stats, taking the mocked animal data above through
+    # the whole processing pipeline to calculate historical stats
+    line_stats = get_colony().get_line_stats(line_name)
+
+    # Expected stats are the same as used in the dev data
+    expected_stats = ColonyDev().get_line_stats(line_name)
+
+    assert_dataclass_equal(line_stats, expected_stats)
