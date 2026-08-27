@@ -39,7 +39,7 @@ dependencies = [
   "psycopg[c]==3.3.4; platform_system!='Windows'",
   "python-slugify==8.0.4",
   "redis==8.0.0",
-  "whitenoise==6.12.0"
+  "whitenoise==6.12.0",
 ]
 
 [dependency-groups]
@@ -53,14 +53,18 @@ dev = [
   "djlint==1.39.2",
   "factory-boy==3.3.3",
   "ipdb==0.13.13",
+  "lxml==6.1.2",
   "mypy==2.1.0",
+  "pooch==1.9.0",
   "pre-commit==4.6.0",
   "pytest==9.1.0",
-  "pytest-django==4.12.0",
+  "pytest-cov==7.1.0",
+  "pytest-django==4.14.0",
+  "pytest-mock==3.15.1",
   "pytest-sugar==1.1.1",
   "ruff==0.15.17",
   "watchfiles==1.2.0",
-  "werkzeug[watchdog]==3.1.8"
+  "werkzeug[watchdog]==3.1.8",
 ]
 docs = [
   "linkify-it-py==2.1.0",

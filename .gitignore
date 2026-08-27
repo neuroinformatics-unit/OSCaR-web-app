@@ -273,3 +273,4 @@ oscar_web_app/media/
 .envs/*
 !.envs/.local/.django
 !.envs/.local/.postgres
+test_data/

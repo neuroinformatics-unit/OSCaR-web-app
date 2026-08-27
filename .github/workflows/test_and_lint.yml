@@ -33,6 +33,14 @@ jobs:
       - name: Checkout Code Repository
         uses: actions/checkout@v7
 
+      - name: Cache pooch test datasets
+        uses: actions/cache@v6
+        with:
+          path: ./test_data
+          key: pooch-${{ hashFiles('./tests/pooch_registry.txt') }}
+          restore-keys: |
+            pooch-
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
@@ -56,7 +64,12 @@ jobs:
         run: docker compose -f docker-compose.local.yml run --rm django python manage.py migrate
 
       - name: Run Django Tests
-        run: docker compose -f docker-compose.local.yml run django pytest
+        run: docker compose -f docker-compose.local.yml run django pytest --cov --cov-report=xml
 
       - name: Tear down the Stack
         run: docker compose -f docker-compose.local.yml down
+
+      - name: Report coverage to codecov
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

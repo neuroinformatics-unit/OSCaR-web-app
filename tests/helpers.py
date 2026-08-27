@@ -1,0 +1,105 @@
+from collections.abc import Mapping
+from dataclasses import asdict
+from io import StringIO
+from typing import Any
+
+import pandas as pd
+import pytest
+
+
+def assert_dataclass_equal(actual, expected, abs_tolerance: float = 1e-3) -> None:
+    """Assert two dataclasses are equal.
+
+    This can handle dataclasses with nested items e.g. dictionaries within
+    dictionaries. It also matches float values within a given tolerance using
+    pytest.approx.
+
+    Parameters
+    ----------
+    actual : dataclass
+        The actual dataclass
+    expected : dataclass
+        The expected dataclass
+    abs_tolerance : float, optional
+        The absolute tolerance for comparing float values inside the
+        dataclasses. This is passed to pytest.approx()
+    """
+    actual_dict = asdict(actual)
+    expected_dict = asdict(expected)
+    _assert_close(actual_dict, expected_dict, abs_tolerance=abs_tolerance)
+
+
+def _assert_close(
+    actual: Any,
+    expected: Any,
+    abs_tolerance: float,
+    message_prefix: str | None = None,
+) -> None:
+    """Assert two values are close, handling nested dicts.
+
+    Parameters
+    ----------
+    actual : Any
+        The actual value
+    expected : Any
+        The expected value
+    abs_tolerance : float
+        The absolute tolerance for comparing float values - this is passed to
+        pytest.approx()
+    message_prefix : str | None, optional
+        Prefix to add to the assertion message. This is useful for nested
+        values to indicate where in the structure the error came from.
+    """
+
+    if isinstance(actual, Mapping):
+        message = f"actual keys are {actual.keys()} vs in expected {expected.keys()}"
+        if message_prefix:
+            message = f"{message_prefix} {message}"
+        assert actual.keys() == expected.keys(), message
+
+        for key in actual:
+            new_prefix = f"{message_prefix} - {key}" if message_prefix else key
+            _assert_close(
+                actual[key],
+                expected[key],
+                abs_tolerance=abs_tolerance,
+                message_prefix=new_prefix,
+            )
+        return
+
+    message = f"actual is {actual} vs in expected {expected}"
+    if message_prefix:
+        message = f"{message_prefix} in {message}"
+
+    if isinstance(actual, float):
+        assert actual == pytest.approx(expected, abs=abs_tolerance), message
+    else:
+        assert actual == expected, message
+
+
+def convert_html_to_df(
+    html_str: str, *, numeric_as_float: bool = False
+) -> pd.DataFrame:
+    """
+    Convert an HTML table string to a pandas DataFrame.
+
+    Parameters
+    ----------
+    html_str : str
+        The HTML string containing a table
+    numeric_as_float : bool, optional
+        When True, forces all numeric columns to be formatted as floats.
+
+    Returns
+    -------
+    pd.DataFrame
+        The converted pandas DataFrame - all columns have str dtype.
+    """
+
+    df = pd.read_html(StringIO(html_str))[0]
+
+    if numeric_as_float:
+        numeric_cols = df.select_dtypes(include="number").columns
+        df[numeric_cols] = df[numeric_cols].astype(float)
+
+    return df.astype(str)
