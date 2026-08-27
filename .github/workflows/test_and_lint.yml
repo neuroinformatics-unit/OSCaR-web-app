@@ -33,6 +33,14 @@ jobs:
       - name: Checkout Code Repository
         uses: actions/checkout@v7
 
+      - name: Cache pooch test datasets
+        uses: actions/cache@v6
+        with:
+          path: ./test_data
+          key: pooch-${{ hashFiles('./tests/pooch_registry.txt') }}
+          restore-keys: |
+            pooch-
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
