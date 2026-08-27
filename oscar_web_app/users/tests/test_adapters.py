@@ -4,6 +4,7 @@ import pytest
 from allauth.core.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.models import SocialLogin
+from allauth.socialaccount.models import get_adapter
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.urls import reverse
@@ -18,6 +19,14 @@ def login_request(rf):
     request._messages = FallbackStorage(request)  # noqa: SLF001
 
     return request
+
+
+def test_social_account_adapter_configured(rf):
+    """Test django-allauth is using the custom SocialAccountAdapter"""
+    request = rf.get("/")
+    adapter = get_adapter(request)
+
+    assert isinstance(adapter, SocialAccountAdapter)
 
 
 @pytest.mark.parametrize(
