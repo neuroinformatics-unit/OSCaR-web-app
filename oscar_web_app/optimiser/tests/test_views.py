@@ -4,6 +4,8 @@ import pandas as pd
 import pytest
 from django.http import Http404
 from django.urls import reverse
+from oscar_colony.breeding_scheme import Genotype
+from oscar_colony.optimise.optimal_scheme_calculator import calculate_optimal_scheme
 from pytest_django.asserts import assertRaisesMessage
 from pytest_django.asserts import assertRedirects
 from pytest_django.asserts import assertTemplateUsed
@@ -12,9 +14,7 @@ from oscar_web_app.optimiser.colony_management import get_colony
 from oscar_web_app.optimiser.forms import GenotypeFormSet
 from oscar_web_app.optimiser.forms import LineForm
 from oscar_web_app.optimiser.views import select_genotypes
-from tests.helpers import convert_html_table_to_df
-
-# ruff: noqa: PLR2004
+from tests.helpers import convert_html_to_df
 
 
 @pytest.fixture
@@ -89,22 +89,40 @@ def test_select_line_with_no_mutations(rf, mocker):
         select_genotypes(request, line_id=1)
 
 
-def test_select_genotypes_post(logged_in_client):
-    line_id = 1
+@pytest.mark.parametrize(
+    ("line_id", "form_params", "required_n_per_genotype"),
+    [
+        pytest.param(
+            1,
+            {
+                "form-TOTAL_FORMS": 2,
+                "form-0-Mut-A": "WT",
+                "form-0-count": 5,
+                "form-1-Mut-A": "HET",
+                "form-1-count": 10,
+            },
+            {(Genotype.WT,): 5, (Genotype.HET,): 10},
+            id="1 mutation",
+        )
+    ],
+)
+def test_select_genotypes_post(
+    logged_in_client, line_id, form_params, required_n_per_genotype
+):
+    """
+    Test submission of select genotypes form renders results page with
+    correct context values.
+    """
 
-    # Submit a form for WT=5 and HET=10
+    # Form params that are the same for all cases
+    default_params = {
+        "form-INITIAL_FORMS": 0,
+        "form-MIN_NUM_FORMS": 1,
+        "form-MAX_NUM_FORMS": 1000,
+    }
     response = logged_in_client.post(
         reverse("optimiser:select_genotypes", args=[line_id]),
-        {
-            "form-TOTAL_FORMS": 2,
-            "form-INITIAL_FORMS": 0,
-            "form-MIN_NUM_FORMS": 1,
-            "form-MAX_NUM_FORMS": 1000,
-            "form-0-Mut-A": "WT",
-            "form-0-count": 5,
-            "form-1-Mut-A": "HET",
-            "form-1-count": 10,
-        },
+        default_params | form_params,
     )
 
     assert response.status_code == HTTPStatus.OK
@@ -124,31 +142,40 @@ def test_select_genotypes_post(logged_in_client):
     assert response.context["stats_litter_size"] == line_stats.average_litter_size
 
     pd.testing.assert_frame_equal(
-        convert_html_table_to_df(response.context["stats_genotype_table"]),
-        line_stats.create_n_per_genotype_df(),
+        convert_html_to_df(response.context["stats_genotype_table"]),
+        line_stats.create_n_per_genotype_df().astype(str),
     )
     pd.testing.assert_frame_equal(
-        convert_html_table_to_df(response.context["stats_scheme_summary_table"]),
-        line_stats.create_scheme_summary_df(decimal_places=2).astype({"Scheme": "str"}),
+        convert_html_to_df(response.context["stats_scheme_summary_table"]),
+        line_stats.create_scheme_summary_df(decimal_places=2).astype(str),
     )
     pd.testing.assert_frame_equal(
-        convert_html_table_to_df(
+        convert_html_to_df(
             response.context["stats_scheme_number_table"], numeric_as_float=True
         ),
-        line_stats.create_scheme_number_df().astype({"Scheme": "str"}),
+        line_stats.create_scheme_number_df().astype(str),
     )
     pd.testing.assert_frame_equal(
-        convert_html_table_to_df(response.context["stats_scheme_proportion_table"]),
-        line_stats.create_scheme_proportion_df(decimal_places=2).astype(
-            {"Scheme": "str"}
-        ),
+        convert_html_to_df(response.context["stats_scheme_proportion_table"]),
+        line_stats.create_scheme_proportion_df(decimal_places=2).astype(str),
+    )
+
+    breeding_schemes, surplus = calculate_optimal_scheme(
+        required_n_per_genotype, line_stats=line_stats, default_litter_size=6
     )
 
     # optimisation result context
-    assert response.context["total_n"] == 16.66
-    assert response.context["total_surplus"] == 1.66
-    assert response.context["required_n"] == 15
+    assert response.context["total_n"] == round(surplus.total_n, 2)
+    assert response.context["total_surplus"] == round(surplus.total_n_surplus, 2)
+    assert response.context["required_n"] == surplus.total_n - surplus.total_n_surplus
 
-    # TODO - stats_genotype_table, stats_scheme_summary_table,
-    # stats_scheme_number_table, stats_scheme_proportion_table, scheme_table,
-    # surplus_genotype_table
+    pd.testing.assert_frame_equal(
+        convert_html_to_df(response.context["scheme_table"]),
+        pd.DataFrame(
+            breeding_schemes.items(), columns=("Scheme", "N matings"), dtype=str
+        ),
+    )
+    pd.testing.assert_frame_equal(
+        convert_html_to_df(response.context["surplus_genotype_table"]),
+        surplus.create_genotype_df(decimal_places=2).astype(str),
+    )

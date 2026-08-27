@@ -77,7 +77,7 @@ def _assert_close(
         assert actual == expected, message
 
 
-def convert_html_table_to_df(
+def convert_html_to_df(
     html_str: str, *, numeric_as_float: bool = False
 ) -> pd.DataFrame:
     """
@@ -88,12 +88,12 @@ def convert_html_table_to_df(
     html_str : str
         The HTML string containing a table
     numeric_as_float : bool, optional
-        When True, forces all numeric columns to have a float dtype.
+        When True, forces all numeric columns to be formatted as floats.
 
     Returns
     -------
     pd.DataFrame
-        The converted pandas DataFrame
+        The converted pandas DataFrame - all columns have str dtype.
     """
 
     df = pd.read_html(StringIO(html_str))[0]
@@ -102,4 +102,4 @@ def convert_html_table_to_df(
         numeric_cols = df.select_dtypes(include="number").columns
         df[numeric_cols] = df[numeric_cols].astype(float)
 
-    return df
+    return df.astype(str)
