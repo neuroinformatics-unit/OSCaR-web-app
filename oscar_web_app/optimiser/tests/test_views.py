@@ -27,6 +27,20 @@ def logged_in_client(client, django_user_model):
     return client
 
 
+@pytest.mark.parametrize(
+    "path",
+    [reverse("optimiser:select_line"), reverse("optimiser:select_genotypes", args=[1])],
+)
+@pytest.mark.django_db
+def test_access_page_not_logged_in(client, path):
+    """
+    Test that accessing a page when not logged in re-directs to the login page
+    """
+
+    response = client.get(path)
+    assertRedirects(response, f"{reverse('account_login')}?next={path}")
+
+
 def test_select_line_get(logged_in_client):
     """Test the select line form is shown on GET"""
 
