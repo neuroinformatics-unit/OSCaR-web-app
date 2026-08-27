@@ -90,12 +90,12 @@ def test_select_line_with_no_mutations(rf, mocker):
 
 
 @pytest.mark.parametrize(
-    ("line_id", "form_params", "required_n_per_genotype"),
+    ("line_id", "line_name", "form_params", "required_n_per_genotype"),
     [
         pytest.param(
             1,
+            "Line-A",
             {
-                "form-TOTAL_FORMS": 2,
                 "form-0-Mut-A": "WT",
                 "form-0-count": 5,
                 "form-1-Mut-A": "HET",
@@ -103,11 +103,44 @@ def test_select_line_with_no_mutations(rf, mocker):
             },
             {(Genotype.WT,): 5, (Genotype.HET,): 10},
             id="1 mutation",
-        )
+        ),
+        pytest.param(
+            2,
+            "Line-AB",
+            {
+                "form-0-Mut-A": "WT",
+                "form-0-Mut-B": "HET",
+                "form-0-count": 15,
+                "form-1-Mut-A": "HOM",
+                "form-1-Mut-B": "HOM",
+                "form-1-count": 35,
+            },
+            {(Genotype.WT, Genotype.HET): 15, (Genotype.HOM, Genotype.HOM): 35},
+            id="2 mutations",
+        ),
+        pytest.param(
+            3,
+            "Line-ABC",
+            {
+                "form-0-Mut-A": "WT",
+                "form-0-Mut-B": "HET",
+                "form-0-Mut-C": "HOM",
+                "form-0-count": 23,
+                "form-1-Mut-A": "HOM",
+                "form-1-Mut-B": "WT",
+                "form-1-Mut-C": "HOM",
+                "form-1-count": 56,
+            },
+            {
+                (Genotype.WT, Genotype.HET, Genotype.HOM): 23,
+                (Genotype.HOM, Genotype.WT, Genotype.HOM): 56,
+            },
+            id="3 mutations",
+        ),
     ],
 )
 def test_select_genotypes_post(
-    logged_in_client, line_id, form_params, required_n_per_genotype
+    logged_in_client, line_id, line_name, form_params, required_n_per_genotype
 ):
     """
     Test submission of select genotypes form renders results page with
@@ -116,6 +149,7 @@ def test_select_genotypes_post(
 
     # Form params that are the same for all cases
     default_params = {
+        "form-TOTAL_FORMS": 2,
         "form-INITIAL_FORMS": 0,
         "form-MIN_NUM_FORMS": 1,
         "form-MAX_NUM_FORMS": 1000,
@@ -129,7 +163,7 @@ def test_select_genotypes_post(
     assertTemplateUsed(response=response, template_name="optimiser/result.html")
 
     # Values should match those in the given line stats
-    line_stats = get_colony().get_line_stats("Line-A")
+    line_stats = get_colony().get_line_stats(line_name)
 
     # Line stats context
     assert response.context["line_name"] == line_stats.line_name
