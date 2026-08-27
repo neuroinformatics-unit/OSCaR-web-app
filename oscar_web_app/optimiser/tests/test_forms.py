@@ -137,7 +137,7 @@ def test_valid_genotype_formsets(formset_data, mutation_names):
                 "form-1-Mut-B": "HET",
                 "form-1-count": 10,
             },
-            ["Mut-A"],
+            ["Mut-A", "Mut-B"],
             "All genotypes must be unique",
             id="2 mutations - duplicate genotypes",
         ),

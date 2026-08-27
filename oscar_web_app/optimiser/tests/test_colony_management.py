@@ -24,6 +24,8 @@ def test_get_valid_colony(colony_software, expected_colony, settings):
 
 
 def test_get_invalid_colony(settings):
+    """Test invalid colony names raise NotImplementedError."""
+
     settings.COLONY_SOFTWARE = "FAKE-COLONY"
 
     error_msg = re.escape("COLONY_SOFTWARE should be set to one of ['DEV', 'PYRAT']")
@@ -65,8 +67,12 @@ def test_optimise_invalid_scheme():
 
 @pytest.mark.usefixtures("colony_software_pyrat")
 def test_pyrat_colony_lines(mocker):
+    """
+    Check this wrapper calls get_pyrat_lines once, and returns the value
+    un-changed.
 
-    # Mock get_pyrat_lines, to avoid calling the real PyRAT API
+    We mock to avoid having to fetch data from a real PyRAT server.
+    """
     mocked_lines = [pd.DataFrame({"name": ["Line-P1", "Line-P2"], "id": [5, 6]})]
     mocked_func = mocker.patch(
         "oscar_web_app.optimiser.colony_management.get_pyrat_lines",
@@ -75,7 +81,6 @@ def test_pyrat_colony_lines(mocker):
 
     lines = get_colony().get_lines()
 
-    # Check it called the PyRAT function once, and returned the value unchanged
     assert mocked_func.call_count == 1
     assert len(lines) == 1
     pd.testing.assert_frame_equal(lines[0], mocked_lines[0])
@@ -83,10 +88,14 @@ def test_pyrat_colony_lines(mocker):
 
 @pytest.mark.usefixtures("colony_software_pyrat")
 def test_pyrat_colony_name(mocker):
+    """
+    Check this wrapper calls get_pyrat_line_name once, and returns the
+    value un-changed.
+
+    We mock to avoid having to fetch data from a real PyRAT server.
+    """
 
     line_id = 5
-
-    # Mock get_pyrat_line_name, to avoid calling the real PyRAT API
     mocked_name = "Line-P1"
     mocked_func = mocker.patch(
         "oscar_web_app.optimiser.colony_management.get_pyrat_line_name",
@@ -104,10 +113,14 @@ def test_pyrat_colony_name(mocker):
 
 @pytest.mark.usefixtures("colony_software_pyrat")
 def test_pyrat_colony_mutations(mocker):
+    """
+    Check this wrapper calls get_pyrat_line_mutations once, and returns the
+    value un-changed.
+
+    We mock to avoid having to fetch data from a real PyRAT server.
+    """
 
     line_id = 5
-
-    # Mock get_pyrat_line_name, to avoid calling the real PyRAT API
     mocked_mutations = ["Mut-X", "Mut-Y"]
     mocked_func = mocker.patch(
         "oscar_web_app.optimiser.colony_management.get_pyrat_line_mutations",
@@ -125,6 +138,7 @@ def test_pyrat_colony_mutations(mocker):
 
 @pytest.mark.usefixtures("colony_software_pyrat")
 def test_line_stats_no_animals(mocker):
+    """Test a line with no animals triggers a 404 response."""
 
     mocker.patch(
         "oscar_web_app.optimiser.colony_management.get_pyrat_data",
@@ -158,6 +172,10 @@ def test_line_stats_no_animals(mocker):
 )
 @pytest.mark.usefixtures("colony_software_pyrat")
 def test_line_stats(pyrat_csv_name, line_name, mocker):
+    """
+    Test the correct line stats are returned when using mocked animal data with
+    one, two or three mutations.
+    """
 
     animal_data = pd.read_csv(pooch_data_path(pyrat_csv_name))
     mocker.patch(

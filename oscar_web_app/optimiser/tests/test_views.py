@@ -208,6 +208,7 @@ def test_select_genotypes_post(
         line_stats.create_scheme_proportion_df(decimal_places=2).astype(str),
     )
 
+    # Values should match those from the optimisation calculation
     breeding_schemes, surplus = calculate_optimal_scheme(
         required_n_per_genotype, line_stats=line_stats, default_litter_size=6
     )
