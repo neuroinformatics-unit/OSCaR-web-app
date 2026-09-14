@@ -136,7 +136,7 @@ Everything inside `< >` needs to be replaced with your own values.
 # General
 # ------------------------------------------------------------------------------
 DJANGO_SETTINGS_MODULE=config.settings.production
-DJANGO_SECRET_KEY=<set to a long random string>
+DJANGO_SECRET_KEY=<a long random sequence of characters and numbers (avoid special characters)>
 DJANGO_ADMIN_URL=<url you want your admin interface to appear at>
 DJANGO_ALLOWED_HOSTS=<enter the domain name you host the website at>
 
@@ -152,8 +152,8 @@ REDIS_URL=redis://redis:6379/0
 # ------------------------------------------------------------------------------
 
 # Flower
-CELERY_FLOWER_USER=<Set to a random string>
-CELERY_FLOWER_PASSWORD=<Set to a long random string>
+CELERY_FLOWER_USER=<a long random sequence of characters and numbers (avoid special characters)>
+CELERY_FLOWER_PASSWORD=<a long random sequence of characters and numbers (avoid special characters)>
 ```
 
 A `.envs/.production/.postgres` file is also required like below. 
@@ -164,8 +164,8 @@ Everything inside `< >` needs to be replaced with your own values.
 POSTGRES_HOST=postgres
 POSTGRES_PORT=5432
 POSTGRES_DB=oscar_web_app
-POSTGRES_USER=<set to a random string>
-POSTGRES_PASSWORD=<set to a long random string>
+POSTGRES_USER=<a long random sequence of characters and numbers (avoid special characters)>
+POSTGRES_PASSWORD=<a long random sequence of characters and numbers (avoid special characters)>
 ```
 
 ## Domain name
