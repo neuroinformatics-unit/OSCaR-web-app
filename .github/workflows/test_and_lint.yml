@@ -49,7 +49,7 @@ jobs:
         with:
           push: false
           load: true
-          files: docker-compose.local.yml
+          files: docker-compose.local.yml,docker-compose.no-celery.yml
           targets: django
           set: |
             django.cache-from=type=gha,scope=django-cached-tests
@@ -58,16 +58,16 @@ jobs:
             postgres.cache-to=type=gha,scope=postgres-cached-tests,mode=max
 
       - name: Check DB Migrations
-        run: docker compose -f docker-compose.local.yml run --rm django python manage.py makemigrations --check
+        run: docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml run --rm django python manage.py makemigrations --check
 
       - name: Run DB Migrations
-        run: docker compose -f docker-compose.local.yml run --rm django python manage.py migrate
+        run: docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml run --rm django python manage.py migrate
 
       - name: Run Django Tests
-        run: docker compose -f docker-compose.local.yml run django pytest --cov --cov-report=xml
+        run: docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml run django pytest --cov --cov-report=xml
 
       - name: Tear down the Stack
-        run: docker compose -f docker-compose.local.yml down
+        run: docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml down
 
       - name: Report coverage to codecov
         uses: codecov/codecov-action@v7
