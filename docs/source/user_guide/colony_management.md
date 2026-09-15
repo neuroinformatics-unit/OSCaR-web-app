@@ -8,7 +8,7 @@ By default, when no settings are provided, the app will be populated with some f
 
 ## PyRAT data
 
-To use PyRAT, create a `.envs/.local/.colony` file like:
+To use PyRAT, create a `.envs/.local/.colony` file (for running locally) or a `.envs/.production/.colony` file (for a production deployment) like:
 ```
 COLONY_SOFTWARE=PYRAT
 PYRAT_URL=https://my-pyrat-url

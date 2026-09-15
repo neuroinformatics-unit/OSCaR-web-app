@@ -6,6 +6,7 @@ Getting started with using OSCaR web app:
 :maxdepth: 2
 
 local_deployment
+prod_deployment
 authentication
 colony_management
 ```
