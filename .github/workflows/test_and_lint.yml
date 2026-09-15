@@ -22,7 +22,7 @@ jobs:
   linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: neuroinformatics-unit/actions/lint@v2
+      - uses: neuroinformatics-unit/actions/lint@v3
 
   # With no caching at all the entire ci process takes 3m to complete!
   test:
