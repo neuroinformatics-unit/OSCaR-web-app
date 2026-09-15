@@ -77,6 +77,9 @@ RUN chmod +x /start-flower
 # Copy the application from the builder
 COPY --from=python-build-stage --chown=django:django ${APP_HOME} ${APP_HOME}
 
+# explicitly create the media folder before changing ownership below
+RUN mkdir -p ${APP_HOME}/oscar_web_app/media
+
 # make django owner of the WORKDIR directory as well.
 RUN chown django:django ${APP_HOME}
 
