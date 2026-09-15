@@ -97,6 +97,56 @@ If updates are made to the branch, you can fetch them with:
 uv sync --upgrade
 ```
 
+## Entering the running container
+
+If you want to open a bash terminal inside the running django docker container use:
+```bash
+docker exec -it oscar_web_app_local_django bash
+```
+
+## Tests
+
+We use [`pytest`](https://docs.pytest.org/en/stable/) with [`pytest-django`](https://pytest-django.readthedocs.io/en/stable/) for tests.
+
+Tests that are specific to a particular app, go inside that directory e.g. `oscar_web_app/optimiser/tests` or `oscar_web_app/users/tests`. Tests that aren't for a particular app, go in the top-level `tests/` directory.
+
+Tests default to using fake data from `COLONY_SOFTWARE=DEV` (set in the test specific django settings at `config/settings/test.py`). This can be overridden by adding e.g. `@pytest.mark.usefixtures("colony_software_pyrat")` to use `COLONY_SOFTWARE=PYRAT`.
+
+Run the tests locally with:
+```bash
+# Creates a temporary container to run the tests, then removes it when complete
+docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml run --rm django pytest
+```
+
+If you'd prefer to run the tests inside an already running container, you can do:
+```bash
+# Enter a bash terminal inside the running django container
+docker exec -it oscar_web_app_local_django bash
+
+# Source some required env variables like DATABASE_URL, and make sure failures won't exit the bash terminal
+source /entrypoint && set +euo pipefail
+
+pytest
+```
+
+## Test coverage
+
+To view test coverage locally, use the same commands as above ([tests section](#tests)) with the `--cov`
+option. For example:
+```bash
+docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml run --rm django pytest --cov
+```
+This will print a summary of coverage per file at the end of the `pytest` results, and create
+a `.coverage` file at the top level of the repository.
+
+To produce an html summary, use `--cov --cov-report=html`. This will produce an `htmlcov` folder at the top level of the repository. Open the `index.html` file inside to view coverage results in your browser.
+
+## Test data
+
+Some test data is stored in the [oscar-test-data GIN repository](https://gin.swc.ucl.ac.uk/neuroinformatics/oscar-test-data), and fetched using [`pooch`](https://www.fatiando.org/pooch/latest/).
+
+If you add / update a test data file, you will need to update the file names and hashes in the pooch registry at `tests/pooch_registry.txt`. Hashes can be generated using [the instructions in poochs' docs](https://www.fatiando.org/pooch/latest/hashes.html#calculating-hashes).
+
 ## Building the docs locally
 
 To build the documentation locally, you will need to install some additional dependencies, then run `sphinx-build` (as below).

@@ -58,7 +58,7 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
                 line_name = get_colony().get_line_name(line_id)
 
             # Run optimisation calculations and render the results
-            context = create_result_page_context(line_name, formset)
+            context = _create_result_page_context(line_name, formset)
             return render(
                 request,
                 "optimiser/result.html",
@@ -113,7 +113,7 @@ def _convert_to_html_table(
     )
 
 
-def create_result_page_context(
+def _create_result_page_context(
     line_name: str, formset: GenotypeFormSet
 ) -> dict[str, Any]:
     """
@@ -136,13 +136,13 @@ def create_result_page_context(
     line_stats = colony_management.get_line_stats(line_name)
     schemes, surplus = colony_management.optimise_schemes(line_stats, formset)
 
-    stats_context = create_line_stats_context(line_stats)
-    scheme_context = create_schemes_context(schemes, surplus)
+    stats_context = _create_line_stats_context(line_stats)
+    scheme_context = _create_schemes_context(schemes, surplus)
 
     return stats_context | scheme_context
 
 
-def create_line_stats_context(
+def _create_line_stats_context(
     line_stats: LineStatistics, decimal_places: int = 2
 ) -> dict[str, Any]:
     """Create context with values from the given LineStatistics.
@@ -185,7 +185,7 @@ def create_line_stats_context(
     }
 
 
-def create_schemes_context(
+def _create_schemes_context(
     schemes: dict[BreedingScheme, int], surplus: SurplusSummary, decimal_places: int = 2
 ) -> dict[str, Any]:
     """Create context with values from calculated breeding schemes / surplus.
