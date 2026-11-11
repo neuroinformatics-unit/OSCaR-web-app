@@ -27,7 +27,7 @@ jobs:
           python-version: 3.14
 
   # With no caching at all the entire ci process takes 3m to complete!
-  test:
+  test-and-mypy:
     needs: [linting]
     runs-on: ubuntu-latest
 
@@ -64,6 +64,9 @@ jobs:
 
       - name: Run DB Migrations
         run: docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml run --rm django python manage.py migrate
+
+      - name: Run mypy
+        run: docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml run --rm django mypy oscar_web_app/
 
       - name: Run Django Tests
         run: docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml run django pytest --cov --cov-report=xml
