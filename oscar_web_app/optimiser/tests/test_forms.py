@@ -9,7 +9,7 @@ def test_line_form():
     """Test line form correctly populates choices from the colony software."""
 
     line_form = LineForm()
-    choices = dict(line_form.fields["line"].choices)
+    choices = dict(line_form.fields["line"].choices)  # type: ignore[attr-defined]
 
     assert choices == {"": "--------", 1: "Line-A", 2: "Line-AB", 3: "Line-ABC"}
 

@@ -17,6 +17,9 @@ if TYPE_CHECKING:
     from oscar_colony.historical_stats import LineStatistics
     from oscar_colony.optimise.surplus_summary import SurplusSummary
 
+    from .colony_management import BaseFormSet
+    from .colony_management import GenotypeForm
+
 
 def select_line(request: HttpRequest) -> HttpResponse:
 
@@ -24,8 +27,8 @@ def select_line(request: HttpRequest) -> HttpResponse:
         form = LineForm(request.POST)
         if form.is_valid():
             line_id = int(form.cleaned_data["line"])
-            line_name = dict(form.fields["line"].choices)[line_id]
-            request.session[line_id] = line_name
+            line_name = dict(form.fields["line"].choices)[line_id]  # type: ignore[attr-defined]
+            request.session[str(line_id)] = line_name
             return redirect("optimiser:select_genotypes", line_id=line_id)
 
     else:
@@ -114,7 +117,7 @@ def _convert_to_html_table(
 
 
 def _create_result_page_context(
-    line_name: str, formset: GenotypeFormSet
+    line_name: str, formset: BaseFormSet[GenotypeForm]
 ) -> dict[str, Any]:
     """
     Run the optimisation calculations for the given line_name, and create
