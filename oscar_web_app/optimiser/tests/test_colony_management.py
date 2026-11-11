@@ -79,7 +79,7 @@ def test_pyrat_colony_lines(mocker):
         return_value=mocked_lines,
     )
 
-    lines = get_colony().get_lines()
+    lines = list(get_colony().get_lines())
 
     assert mocked_func.call_count == 1
     assert len(lines) == 1

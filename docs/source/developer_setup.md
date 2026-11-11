@@ -147,6 +147,18 @@ Some test data is stored in the [oscar-test-data GIN repository](https://gin.swc
 
 If you add / update a test data file, you will need to update the file names and hashes in the pooch registry at `tests/pooch_registry.txt`. Hashes can be generated using [the instructions in poochs' docs](https://www.fatiando.org/pooch/latest/hashes.html#calculating-hashes).
 
+## Run mypy
+
+Run mypy locally with:
+```bash
+docker compose -f docker-compose.local.yml -f docker-compose.no-celery.yml run --rm django mypy oscar_web_app/
+```
+
+Or, as in the [testing section](#tests), you can enter a running container and call:
+```bash
+mypy oscar_web_app/
+```
+
 ## Building the docs locally
 
 To build the documentation locally, you will need to install some additional dependencies, then run `sphinx-build` (as below).

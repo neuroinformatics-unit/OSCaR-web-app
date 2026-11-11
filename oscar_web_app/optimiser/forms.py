@@ -10,6 +10,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import BaseFormSet
 from django.forms import formset_factory
+from django.forms.formsets import DELETION_FIELD_NAME
 
 from .colony_management import get_colony
 
@@ -117,14 +118,13 @@ class BaseGenotypeFormset(BaseFormSet):
 
         for form in self.forms:
             # ignore forms marked for deletion
-            if self.can_delete and self._should_delete_form(form):
+            if self.can_delete and form.cleaned_data.get(DELETION_FIELD_NAME, False):
                 continue
 
-            genotype = [
+            genotype = tuple(
                 form.cleaned_data.get(mutation_field)
                 for mutation_field in mutation_fields
-            ]
-            genotype = tuple(genotype)
+            )
 
             if genotype in genotypes:
                 msg = "All genotypes must be unique"

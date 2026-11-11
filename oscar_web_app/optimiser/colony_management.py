@@ -20,9 +20,12 @@ from oscar_colony.optimise.optimal_scheme_calculator import SurplusSummary
 from oscar_colony.optimise.optimal_scheme_calculator import calculate_optimal_scheme
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from collections.abc import Iterator
 
-    from .forms import GenotypeFormSet
+    from django.forms import BaseFormSet
+
+    from oscar_web_app.optimiser.forms import GenotypeForm
 
 
 class ColonySoftware(StrEnum):
@@ -59,7 +62,7 @@ class ColonyManagement(ABC):
     """
 
     @abstractmethod
-    def get_lines(self) -> Iterator[pd.DataFrame]:
+    def get_lines(self) -> Iterable[pd.DataFrame]:
         """Get names and ids of available lines"""
 
     @abstractmethod
@@ -75,7 +78,7 @@ class ColonyManagement(ABC):
         """Get historical stats for the given line"""
 
     def optimise_schemes(
-        self, line_stats: LineStatistics, genotype_formset: GenotypeFormSet
+        self, line_stats: LineStatistics, genotype_formset: BaseFormSet[GenotypeForm]
     ) -> tuple[dict[BreedingScheme, int], SurplusSummary]:
         """
         Calculate optimal breeding schemes for the given line.
@@ -151,7 +154,7 @@ class ColonyPyRAT(ColonyManagement):
         )
 
         # Standardise all fetched data
-        standardised_dfs = []
+        standardised_dfs: list[pd.DataFrame] = []
         for animal_df in animal_data:
             if len(standardised_dfs) == 0 and animal_df.empty:
                 msg = "No animals found for chosen line"
@@ -462,10 +465,10 @@ class ColonyDev(ColonyManagement):
         ),
     }
 
-    def get_lines(self) -> Iterator[pd.DataFrame]:
+    def get_lines(self) -> list[pd.DataFrame]:
         """Get names and ids of available lines"""
 
-        columns = {"name": [], "id": []}
+        columns: dict[str, list[str | int]] = {"name": [], "id": []}
         for line_id, line_stats in self._line_id_to_stats.items():
             columns["name"].append(line_stats.line_name)
             columns["id"].append(line_id)
