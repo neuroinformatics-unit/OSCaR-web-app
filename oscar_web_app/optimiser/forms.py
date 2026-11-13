@@ -61,6 +61,12 @@ class GenotypeForm(forms.Form):
 
     count = forms.IntegerField(min_value=1, initial=1)
 
+    sex = forms.ChoiceField(
+        label="Sex",
+        choices=[("any", "any"), ("male", "male"), ("female", "female")],
+        required=True,
+    )
+
     def __init__(self, *args, mutation_names=None, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -85,6 +91,7 @@ class GenotypeForm(forms.Form):
             Row(
                 *(Column(name) for name in mutation_names),
                 Column("count", css_class="col-md-2"),
+                Column("sex", css_class="col-md-3"),
                 Column(
                     StrictButton(
                         "X",
@@ -109,11 +116,11 @@ class BaseGenotypeFormset(BaseFormSet):
         if any(self.errors):
             return
 
-        genotypes = set()
+        genotypes = {}
         mutation_fields = [
             field_name
             for field_name in self.forms[0].cleaned_data
-            if field_name not in ["count", "DELETE"]
+            if field_name not in ["count", "sex", "DELETE"]
         ]
 
         for form in self.forms:
@@ -121,15 +128,24 @@ class BaseGenotypeFormset(BaseFormSet):
             if self.can_delete and form.cleaned_data.get(DELETION_FIELD_NAME, False):
                 continue
 
+            # Enforce that genotypes can't specify rows for sex=any AND
+            # (sex=male or sex=female)
             genotype = tuple(
                 form.cleaned_data.get(mutation_field)
                 for mutation_field in mutation_fields
             )
+            sex = form.cleaned_data["sex"]
 
-            if genotype in genotypes:
-                msg = "All genotypes must be unique"
+            # split into "sexed" or "any"
+            sex_class = "sexed" if sex in ["male", "female"] else sex
+
+            if (genotype in genotypes) and (sex_class != genotypes[genotype]):
+                msg = (
+                    "Each genotype must either have rows for sex=male/female "
+                    "OR sex=any. Not both."
+                )
                 raise ValidationError(msg)
-            genotypes.add(genotype)
+            genotypes[genotype] = sex_class
 
 
 GenotypeFormSet = formset_factory(
