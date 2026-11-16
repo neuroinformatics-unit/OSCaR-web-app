@@ -64,10 +64,9 @@ class GenotypeForm(forms.Form):
     count_females = forms.IntegerField(label="# females", min_value=1, initial=1)
 
     count_type = forms.ChoiceField(
-        choices=[("any_sex", "any sex"), ("sexed", "# males/females")],
+        choices=[("any_sex", "any sex"), ("specific_sex", "# males/females")],
         initial="any_sex",
-        widget=forms.RadioSelect,
-        label="",
+        label="Required sex",
     )
 
     def __init__(self, *args, mutation_names=None, **kwargs):
@@ -94,9 +93,9 @@ class GenotypeForm(forms.Form):
             Row(
                 *(Column(name) for name in mutation_names),
                 Column("count_type", css_class="col-md-2"),
-                Column("count_any_sex", css_class="col-md-2"),
-                Column("count_males", css_class="col-md-2"),
-                Column("count_females", css_class="col-md-2"),
+                Column("count_any_sex", css_class="col-md-2 count-any-sex"),
+                Column("count_males", css_class="col-md-1 d-none count-specific-sex"),
+                Column("count_females", css_class="col-md-1 d-none count-specific-sex"),
                 Column(
                     StrictButton(
                         "X",
@@ -106,7 +105,7 @@ class GenotypeForm(forms.Form):
                     css_class="col-md-1 mb-3 d-flex align-items-end",
                 ),
                 Column("DELETE", css_class="d-none"),  # Hide django's deletion checkbox
-                css_class="bg-light rounded-4 p-1 my-2",
+                css_class="genotype-form bg-light rounded-4 p-1 my-2",
             )
         )
 
