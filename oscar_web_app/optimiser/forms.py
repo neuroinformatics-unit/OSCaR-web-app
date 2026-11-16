@@ -59,7 +59,16 @@ class LineForm(forms.Form):
 class GenotypeForm(forms.Form):
     """Form to specify required number of animals of one genotype"""
 
-    count = forms.IntegerField(min_value=1, initial=1)
+    count_any_sex = forms.IntegerField(label="# total", min_value=1, initial=1)
+    count_males = forms.IntegerField(label="# males", min_value=1, initial=1)
+    count_females = forms.IntegerField(label="# females", min_value=1, initial=1)
+
+    count_type = forms.ChoiceField(
+        choices=[("any_sex", "any sex"), ("sexed", "# males/females")],
+        initial="any_sex",
+        widget=forms.RadioSelect,
+        label="",
+    )
 
     def __init__(self, *args, mutation_names=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -84,7 +93,10 @@ class GenotypeForm(forms.Form):
         self.helper.layout = Layout(
             Row(
                 *(Column(name) for name in mutation_names),
-                Column("count", css_class="col-md-2"),
+                Column("count_type", css_class="col-md-2"),
+                Column("count_any_sex", css_class="col-md-2"),
+                Column("count_males", css_class="col-md-2"),
+                Column("count_females", css_class="col-md-2"),
                 Column(
                     StrictButton(
                         "X",
