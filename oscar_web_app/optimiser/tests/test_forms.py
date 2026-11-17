@@ -139,57 +139,57 @@ def test_valid_genotype_formsets(formset_params, mutation_names):
 
 
 @pytest.mark.parametrize(
-    ("formset_data", "mutation_names", "expected_msg"),
+    ("formset_params", "mutation_names", "expected_msg"),
     [
         pytest.param(
-            {
-                "form-TOTAL_FORMS": 1,
-                "form-INITIAL_FORMS": 0,
-                "form-MIN_NUM_FORMS": 1,
-                "form-MAX_NUM_FORMS": 1000,
-                "form-0-Mut-A": "WT",
-                "form-0-count": 1,
-                "form-0-DELETE": "on",
-            },
+            [
+                {"Mut-A": "WT", "count_type": "any_sex", "DELETE": "on"},
+            ],
             ["Mut-A"],
             "Please submit at least 1 form.",
             id="All forms marked deleted",
         ),
         pytest.param(
-            {
-                "form-TOTAL_FORMS": 2,
-                "form-INITIAL_FORMS": 0,
-                "form-MIN_NUM_FORMS": 1,
-                "form-MAX_NUM_FORMS": 1000,
-                "form-0-Mut-A": "HET",
-                "form-0-count": 5,
-                "form-1-Mut-A": "HET",
-                "form-1-count": 20,
-            },
+            [
+                {"Mut-A": "HET", "count_type": "any_sex"},
+                {"Mut-A": "HET", "count_type": "any_sex"},
+            ],
             ["Mut-A"],
             "All genotypes must be unique",
-            id="1 mutation - duplicate genotypes",
+            id="1 mutation (any sex) - duplicate genotypes",
         ),
         pytest.param(
-            {
-                "form-TOTAL_FORMS": 2,
-                "form-INITIAL_FORMS": 0,
-                "form-MIN_NUM_FORMS": 1,
-                "form-MAX_NUM_FORMS": 1000,
-                "form-0-Mut-A": "WT",
-                "form-0-Mut-B": "HET",
-                "form-0-count": 5,
-                "form-1-Mut-A": "WT",
-                "form-1-Mut-B": "HET",
-                "form-1-count": 10,
-            },
+            [
+                {"Mut-A": "HET", "count_type": "specific_sex"},
+                {"Mut-A": "HET", "count_type": "specific_sex"},
+            ],
+            ["Mut-A"],
+            "All genotypes must be unique",
+            id="1 mutation (specific sex) - duplicate genotypes",
+        ),
+        pytest.param(
+            [
+                {"Mut-A": "HET", "count_type": "any_sex"},
+                {"Mut-A": "HET", "count_type": "specific_sex"},
+            ],
+            ["Mut-A"],
+            "All genotypes must be unique",
+            id="1 mutation (mixed sex) - duplicate genotypes",
+        ),
+        pytest.param(
+            [
+                {"Mut-A": "WT", "Mut-B": "HET", "count_type": "any_sex"},
+                {"Mut-A": "WT", "Mut-B": "HET", "count_type": "any_sex"},
+            ],
             ["Mut-A", "Mut-B"],
             "All genotypes must be unique",
-            id="2 mutations - duplicate genotypes",
+            id="2 mutations (any sex) - duplicate genotypes",
         ),
     ],
 )
-def test_invalid_genotype_formsets(formset_data, mutation_names, expected_msg):
+def test_invalid_genotype_formsets(formset_params, mutation_names, expected_msg):
+
+    formset_data = create_formset_data(formset_params)
     formset = GenotypeFormSet(
         formset_data,
         form_kwargs={"mutation_names": mutation_names},
