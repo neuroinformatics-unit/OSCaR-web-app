@@ -70,7 +70,7 @@
          aria-labelledby="scheme-genotype-tab"
          tabindex="0">
       <div class="row justify-content-center my-4">
-        <div class="col-md-8 table-responsive">{{ surplus_genotype_table | safe }}</div>
+        <div class="col-auto table-responsive">{{ surplus_genotype_table | safe }}</div>
       </div>
     </div>
     {% comment %} Tabs for the historical statistics information {% endcomment %}
@@ -129,9 +129,9 @@
            role="tabpanel"
            aria-labelledby="stats-genotype-tab"
            tabindex="0">
-        <row class="row justify-content-center my-4">
-        <div class="col-md-8 table-responsive">{{ stats_genotype_table | safe }}</div>
-        </row>
+        <div class="row justify-content-center my-4">
+          <div class="col-md-8 table-responsive">{{ stats_genotype_table | safe }}</div>
+        </div>
       </div>
       {% comment %} Historical stats by scheme tab content {% endcomment %}
       <div class="tab-pane fade"
