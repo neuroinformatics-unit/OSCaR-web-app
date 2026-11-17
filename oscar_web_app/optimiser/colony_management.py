@@ -18,6 +18,7 @@ from oscar_colony.historical_stats import LineStatistics
 from oscar_colony.historical_stats import calculate_historical_stats_for_line
 from oscar_colony.optimise.optimal_scheme_calculator import SurplusSummary
 from oscar_colony.optimise.optimal_scheme_calculator import calculate_optimal_scheme
+from oscar_colony.optimise.surplus_summary import SexSplit
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -114,7 +115,17 @@ class ColonyManagement(ABC):
                 mutation_value = genotype_data[mutation_name]
                 genotype.append(Genotype[mutation_value])
 
-            required_n_per_genotype[tuple(genotype)] = genotype_data["count"]
+            # Set required count as either a total for any sex OR
+            # a specific number of males and females
+            if genotype_data["count_type"] == "any_sex":
+                required_count = genotype_data["count_any_sex"]
+            else:
+                required_count = SexSplit(
+                    n_males=genotype_data["count_males"],
+                    n_females=genotype_data["count_females"],
+                )
+
+            required_n_per_genotype[tuple(genotype)] = required_count
 
         try:
             breeding_schemes, surplus = calculate_optimal_scheme(
