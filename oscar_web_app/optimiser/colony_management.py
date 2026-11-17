@@ -195,6 +195,7 @@ class ColonyDev(ColonyManagement):
             n_mutations=1,
             total_n_offspring=18,
             total_n_genotyped_offspring=18,
+            total_n_sexed_offspring=18,
             total_n_offspring_per_genotype={
                 (Genotype.WT,): 6,
                 (Genotype.HET,): 10,
@@ -202,14 +203,17 @@ class ColonyDev(ColonyManagement):
             },
             total_n_successful_matings=9,
             average_litter_size=2,
+            proportion_male=0.6111,
             stats_per_breeding_scheme={
                 BreedingScheme("wt", "het"): BreedingSchemeStatistics(
                     n_breeding_pairs=2,
                     n_successful_matings=3,
                     average_litter_size=2.666,
+                    proportion_male=0.625,
                     average_n_litters_per_pair=1.5,
                     total_n_offspring=8,
                     total_n_genotyped_offspring=8,
+                    total_n_sexed_offspring=8,
                     n_offspring_per_genotype={
                         (Genotype.WT,): 4,
                         (Genotype.HET,): 4,
@@ -223,9 +227,11 @@ class ColonyDev(ColonyManagement):
                     n_breeding_pairs=2,
                     n_successful_matings=2,
                     average_litter_size=2,
+                    proportion_male=0.5,
                     average_n_litters_per_pair=1.0,
                     total_n_offspring=4,
                     total_n_genotyped_offspring=4,
+                    total_n_sexed_offspring=4,
                     n_offspring_per_genotype={(Genotype.HET,): 4},
                     proportion_offspring_per_genotype={(Genotype.HET,): 1.0},
                 ),
@@ -233,9 +239,11 @@ class ColonyDev(ColonyManagement):
                     n_breeding_pairs=2,
                     n_successful_matings=2,
                     average_litter_size=2,
+                    proportion_male=0.75,
                     average_n_litters_per_pair=1.0,
                     total_n_offspring=4,
                     total_n_genotyped_offspring=4,
+                    total_n_sexed_offspring=4,
                     n_offspring_per_genotype={
                         (Genotype.WT,): 2,
                         (Genotype.HET,): 1,
@@ -251,9 +259,11 @@ class ColonyDev(ColonyManagement):
                     n_breeding_pairs=2,
                     n_successful_matings=2,
                     average_litter_size=1.0,
+                    proportion_male=0.5,
                     average_n_litters_per_pair=1.0,
                     total_n_offspring=2,
                     total_n_genotyped_offspring=2,
+                    total_n_sexed_offspring=2,
                     n_offspring_per_genotype={
                         (Genotype.HET,): 1,
                         (Genotype.HOM,): 1,
@@ -271,6 +281,7 @@ class ColonyDev(ColonyManagement):
             n_mutations=2,
             total_n_offspring=20,
             total_n_genotyped_offspring=20,
+            total_n_sexed_offspring=20,
             total_n_offspring_per_genotype={
                 (Genotype.HOM, Genotype.HOM): 2,
                 (Genotype.HET, Genotype.HOM): 6,
@@ -281,14 +292,17 @@ class ColonyDev(ColonyManagement):
             },
             total_n_successful_matings=10,
             average_litter_size=2,
+            proportion_male=0.6,
             stats_per_breeding_scheme={
                 BreedingScheme("het_hom", "hom_het"): BreedingSchemeStatistics(
                     n_breeding_pairs=2,
                     n_successful_matings=3,
                     average_litter_size=2.666,
+                    proportion_male=0.625,
                     average_n_litters_per_pair=1.5,
                     total_n_offspring=8,
                     total_n_genotyped_offspring=8,
+                    total_n_sexed_offspring=8,
                     n_offspring_per_genotype={
                         (Genotype.HOM, Genotype.HOM): 2,
                         (Genotype.HET, Genotype.HOM): 6,
@@ -302,9 +316,11 @@ class ColonyDev(ColonyManagement):
                     n_breeding_pairs=2,
                     n_successful_matings=2,
                     average_litter_size=2.0,
+                    proportion_male=0.5,
                     average_n_litters_per_pair=1.0,
                     total_n_offspring=4,
                     total_n_genotyped_offspring=4,
+                    total_n_sexed_offspring=4,
                     n_offspring_per_genotype={
                         (
                             Genotype.HOM,
@@ -322,9 +338,11 @@ class ColonyDev(ColonyManagement):
                     n_breeding_pairs=2,
                     n_successful_matings=2,
                     average_litter_size=1.5,
+                    proportion_male=0.6667,
                     average_n_litters_per_pair=1.0,
                     total_n_offspring=3,
                     total_n_genotyped_offspring=3,
+                    total_n_sexed_offspring=3,
                     n_offspring_per_genotype={
                         (Genotype.HET, Genotype.WT): 2,
                         (Genotype.WT, Genotype.HET): 1,
@@ -338,9 +356,11 @@ class ColonyDev(ColonyManagement):
                     n_breeding_pairs=2,
                     n_successful_matings=2,
                     average_litter_size=1.0,
+                    proportion_male=0.5,
                     average_n_litters_per_pair=1.0,
                     total_n_offspring=2,
                     total_n_genotyped_offspring=2,
+                    total_n_sexed_offspring=2,
                     n_offspring_per_genotype={
                         (
                             Genotype.WT,
@@ -360,9 +380,11 @@ class ColonyDev(ColonyManagement):
                     n_breeding_pairs=1,
                     n_successful_matings=1,
                     average_litter_size=3.0,
+                    proportion_male=0.6667,
                     average_n_litters_per_pair=1.0,
                     total_n_offspring=3,
                     total_n_genotyped_offspring=3,
+                    total_n_sexed_offspring=3,
                     n_offspring_per_genotype={
                         (
                             Genotype.HET,
@@ -381,6 +403,7 @@ class ColonyDev(ColonyManagement):
             n_mutations=3,
             total_n_offspring=20,
             total_n_genotyped_offspring=20,
+            total_n_sexed_offspring=20,
             total_n_offspring_per_genotype={
                 (Genotype.HET, Genotype.WT, Genotype.HOM): 10,
                 (Genotype.WT, Genotype.HET, Genotype.HOM): 2,
@@ -393,14 +416,17 @@ class ColonyDev(ColonyManagement):
             },
             total_n_successful_matings=10,
             average_litter_size=2,
+            proportion_male=0.6,
             stats_per_breeding_scheme={
                 BreedingScheme("wt_wt_het", "het_het_het"): BreedingSchemeStatistics(
                     n_breeding_pairs=2,
                     n_successful_matings=3,
                     average_litter_size=2.666,
+                    proportion_male=0.625,
                     average_n_litters_per_pair=1.5,
                     total_n_offspring=8,
                     total_n_genotyped_offspring=8,
+                    total_n_sexed_offspring=8,
                     n_offspring_per_genotype={
                         (Genotype.HET, Genotype.WT, Genotype.HOM): 6,
                         (Genotype.WT, Genotype.HET, Genotype.HOM): 2,
@@ -414,23 +440,27 @@ class ColonyDev(ColonyManagement):
                     n_breeding_pairs=2,
                     n_successful_matings=2,
                     average_litter_size=2.0,
+                    proportion_male=0.5,
                     average_n_litters_per_pair=1.0,
                     total_n_offspring=4,
                     total_n_genotyped_offspring=4,
+                    total_n_sexed_offspring=4,
                     n_offspring_per_genotype={
                         (Genotype.HET, Genotype.WT, Genotype.HOM): 4
                     },
                     proportion_offspring_per_genotype={
-                        (Genotype.HET, Genotype.WT, Genotype.HOM): 1.0,
+                        (Genotype.HET, Genotype.WT, Genotype.HOM): 1.0
                     },
                 ),
                 BreedingScheme("het_wt_wt", "wt_het_hom"): BreedingSchemeStatistics(
                     n_breeding_pairs=2,
                     n_successful_matings=2,
                     average_litter_size=1.5,
+                    proportion_male=0.6667,
                     average_n_litters_per_pair=1.0,
                     total_n_offspring=3,
                     total_n_genotyped_offspring=3,
+                    total_n_sexed_offspring=3,
                     n_offspring_per_genotype={
                         (Genotype.WT, Genotype.WT, Genotype.HET): 1,
                         (Genotype.HET, Genotype.WT, Genotype.HET): 1,
@@ -446,9 +476,11 @@ class ColonyDev(ColonyManagement):
                     n_breeding_pairs=2,
                     n_successful_matings=2,
                     average_litter_size=1.0,
+                    proportion_male=0.5,
                     average_n_litters_per_pair=1.0,
                     total_n_offspring=2,
                     total_n_genotyped_offspring=2,
+                    total_n_sexed_offspring=2,
                     n_offspring_per_genotype={
                         (Genotype.WT, Genotype.HET, Genotype.WT): 2,
                     },
@@ -460,9 +492,11 @@ class ColonyDev(ColonyManagement):
                     n_breeding_pairs=1,
                     n_successful_matings=1,
                     average_litter_size=3.0,
+                    proportion_male=0.6667,
                     average_n_litters_per_pair=1.0,
                     total_n_offspring=3,
                     total_n_genotyped_offspring=3,
+                    total_n_sexed_offspring=3,
                     n_offspring_per_genotype={
                         (Genotype.HET, Genotype.HET, Genotype.WT): 2,
                         (Genotype.HET, Genotype.HET, Genotype.HET): 1,
