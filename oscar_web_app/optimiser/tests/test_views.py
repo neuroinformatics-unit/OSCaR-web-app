@@ -222,8 +222,8 @@ def test_select_genotypes_post(
     assert context["stats_genotyped_n"] == line_stats.total_n_genotyped_offspring
     assert context["stats_sexed_n"] == line_stats.total_n_sexed_offspring
     assert context["stats_matings_n"] == line_stats.total_n_successful_matings
-    assert context["stats_litter_size"] == line_stats.average_litter_size
-    assert context["stats_proportion_male"] == line_stats.proportion_male
+    assert context["stats_litter_size"] == round(line_stats.average_litter_size, 2)
+    assert context["stats_proportion_male"] == round(line_stats.proportion_male, 2)
 
     pd.testing.assert_frame_equal(
         convert_html_to_df(context["stats_genotype_table"]),
