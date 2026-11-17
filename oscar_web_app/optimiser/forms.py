@@ -69,14 +69,16 @@ class GenotypeForm(forms.Form):
         label="Required sex",
     )
 
-    def __init__(self, *args, mutation_names=None, **kwargs):
+    def __init__(self, *args, mutation_names: list[str] | None = None, **kwargs):
+        """
+        Create a ChoiceField for each provided mutation_name and setup form
+        layout.
+        """
         super().__init__(*args, **kwargs)
-
-        if mutation_names is None:
-            mutation_names = []
+        self.mutation_names = mutation_names if mutation_names is not None else []
 
         # mutations is a kwarg
-        for mutation_name in mutation_names:
+        for mutation_name in self.mutation_names:
             self.fields[mutation_name] = forms.ChoiceField(
                 label=mutation_name,
                 choices=(
@@ -91,7 +93,7 @@ class GenotypeForm(forms.Form):
         self.helper.disable_csrf = True
         self.helper.layout = Layout(
             Row(
-                *(Column(name) for name in mutation_names),
+                *(Column(name) for name in self.mutation_names),
                 Column("count_type", css_class="col-md-2"),
                 Column("count_any_sex", css_class="col-md-2 count-any-sex"),
                 Column("count_males", css_class="col-md-1 d-none count-specific-sex"),
@@ -121,11 +123,7 @@ class BaseGenotypeFormset(BaseFormSet):
             return
 
         genotypes = set()
-        mutation_fields = [
-            field_name
-            for field_name in self.forms[0].cleaned_data
-            if field_name not in ["count", "DELETE"]
-        ]
+        mutation_fields = self.forms[0].mutation_names
 
         for form in self.forms:
             # ignore forms marked for deletion

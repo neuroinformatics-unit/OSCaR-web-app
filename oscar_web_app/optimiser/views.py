@@ -218,13 +218,15 @@ def _create_schemes_context(
     )
     scheme_table = _convert_to_html_table(scheme_table)
 
-    surplus_genotype_table = surplus.create_genotype_df(decimal_places)
-    surplus_genotype_table = _convert_to_html_table(surplus_genotype_table)
+    surplus_summary_table = _convert_to_html_table(
+        surplus.create_summary_df(decimal_places)
+    )
+    surplus_genotype_table = _convert_to_html_table(
+        surplus.create_genotype_df(decimal_places)
+    )
 
     return {
         "scheme_table": scheme_table,
-        "total_n": round(surplus.total_n, decimal_places),
-        "total_surplus": round(surplus.total_n_surplus, decimal_places),
-        "required_n": round(surplus.total_n - surplus.total_n_surplus, decimal_places),
+        "surplus_summary_table": surplus_summary_table,
         "surplus_genotype_table": surplus_genotype_table,
     }
