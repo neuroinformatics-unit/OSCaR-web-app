@@ -22,11 +22,9 @@ function addGenotype() {
         attr.value = attr.value.replace(/__prefix__/g, nForms);
         }
     });
-    const genotypeForm = emptyForm.querySelector(".genotype-form");
 
     genotypeForms.append(emptyForm);
     totalForms.value = nForms + 1;
-    setupCountTypeToggle(genotypeForm);
 }
 
 // Mark a genotype row for deletion, and hide it from the user
