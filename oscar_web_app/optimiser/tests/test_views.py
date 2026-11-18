@@ -6,6 +6,7 @@ from django.http import Http404
 from django.urls import reverse
 from oscar_colony.breeding_scheme import Genotype
 from oscar_colony.optimise.optimal_scheme_calculator import calculate_optimal_scheme
+from oscar_colony.optimise.surplus_summary import SexSplit
 from pytest_django.asserts import assertRaisesMessage
 from pytest_django.asserts import assertRedirects
 from pytest_django.asserts import assertTemplateUsed
@@ -136,7 +137,54 @@ def test_select_line_with_no_mutations(rf, mocker):
                 },
             ],
             {(Genotype.WT,): 5, (Genotype.HET,): 10},
-            id="1 mutation",
+            id="1 mutation (any sex)",
+        ),
+        pytest.param(
+            1,
+            "Line-A",
+            [
+                {
+                    "Mut-A": "WT",
+                    "count_type": "specific_sex",
+                    "count_any_sex": 1,
+                    "count_males": 20,
+                    "count_females": 30,
+                },
+                {
+                    "Mut-A": "HET",
+                    "count_type": "specific_sex",
+                    "count_any_sex": 1,
+                    "count_males": 14,
+                    "count_females": 32,
+                },
+            ],
+            {
+                (Genotype.WT,): SexSplit(n_males=20, n_females=30),
+                (Genotype.HET,): SexSplit(n_males=14, n_females=32),
+            },
+            id="1 mutation (specific sex)",
+        ),
+        pytest.param(
+            1,
+            "Line-A",
+            [
+                {
+                    "Mut-A": "WT",
+                    "count_type": "any_sex",
+                    "count_any_sex": 42,
+                    "count_males": 1,
+                    "count_females": 1,
+                },
+                {
+                    "Mut-A": "HET",
+                    "count_type": "specific_sex",
+                    "count_any_sex": 1,
+                    "count_males": 14,
+                    "count_females": 32,
+                },
+            ],
+            {(Genotype.WT,): 42, (Genotype.HET,): SexSplit(n_males=14, n_females=32)},
+            id="1 mutation (mixed sex)",
         ),
         pytest.param(
             2,
@@ -160,7 +208,7 @@ def test_select_line_with_no_mutations(rf, mocker):
                 },
             ],
             {(Genotype.WT, Genotype.HET): 15, (Genotype.HOM, Genotype.HOM): 35},
-            id="2 mutations",
+            id="2 mutations (any sex)",
         ),
         pytest.param(
             3,
@@ -189,7 +237,7 @@ def test_select_line_with_no_mutations(rf, mocker):
                 (Genotype.WT, Genotype.HET, Genotype.HOM): 23,
                 (Genotype.HOM, Genotype.WT, Genotype.HOM): 56,
             },
-            id="3 mutations",
+            id="3 mutations (any sex)",
         ),
     ],
 )
