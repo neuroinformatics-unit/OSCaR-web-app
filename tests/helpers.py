@@ -105,12 +105,12 @@ def convert_html_to_df(
     return df.astype(str)
 
 
-def create_formset_data(form_params: list[dict[str, str]]) -> dict[str, Any]:
+def create_formset_data(form_params: list[dict[str, Any]]) -> dict[str, Any]:
     """Create some test formset data.
 
     Parameters
     ----------
-    form_params : list[dict[str, str]]
+    form_params : list[dict[str, Any]]
         A list of parameters for each generated form. Each set of parameters
         is given as a dict, which will be added as form-{form-number}-{key} = value.
 
