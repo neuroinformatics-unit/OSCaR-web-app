@@ -80,6 +80,9 @@ docs = [
 [tool.setuptools]
 packages = [ "oscar_web_app" ]
 
+[tool.uv]
+sources.oscar-colony = { git = "https://github.com/neuroinformatics-unit/OSCaR", rev = "km/summary_dfs_sex" }
+
 # ==== djLint ====
 [tool.djlint]
 profile = "django"
