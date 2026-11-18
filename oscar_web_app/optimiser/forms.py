@@ -1,16 +1,15 @@
 from crispy_forms.bootstrap import StrictButton
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML
 from crispy_forms.layout import Column
 from crispy_forms.layout import Div
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Row
-from crispy_forms.layout import Submit
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import BaseFormSet
 from django.forms import formset_factory
 from django.forms.formsets import DELETION_FIELD_NAME
+from django.urls import reverse
 
 from .colony_management import get_colony
 
@@ -41,18 +40,15 @@ class LineForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["line"].widget.attrs.update(
+            {
+                "hx-post": reverse("optimiser:select_line"),
+                "hx-target": "#genotype-form-container",
+            }
+        )
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Div(Column("line", css_class="col-md-7 mx-auto")),
-            Div(
-                HTML(
-                    """
-                    <a href="{% url 'home' %}" class="btn btn-secondary px-5">Back</a>
-                    """
-                ),
-                Submit("submit", "Next", css_class="btn btn-primary px-5"),
-                css_class="d-flex justify-content-center gap-2",
-            ),
         )
 
 

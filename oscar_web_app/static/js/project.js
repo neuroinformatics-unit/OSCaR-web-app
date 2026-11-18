@@ -1,18 +1,14 @@
-const addButton = document.querySelector("#add-genotype");
-const genotypeForms = document.querySelector("#genotype-forms");
-const totalForms = document.querySelector("#id_form-TOTAL_FORMS");
-const emptyTemplate = document.querySelector("#empty-form")
-
-
-if (addButton) {
-    addButton.addEventListener("click", addGenotype);
-}
-if (genotypeForms) {
-    genotypeForms.addEventListener("click", removeGenotype);
-}
+document.addEventListener("click", (e) => {
+    if (e.target.closest("#add-genotype")) addGenotype();
+    removeGenotype(e);
+});
 
 // Add a new, empty genotype form to the genotypeForms container
 function addGenotype() {
+    const genotypeForms = document.querySelector("#genotype-forms");
+    const totalForms = document.querySelector("#id_form-TOTAL_FORMS");
+    const emptyTemplate = document.querySelector("#empty-form")
+
     const nForms = Number(totalForms.value);
     const emptyForm = emptyTemplate.content.cloneNode(true);
 
