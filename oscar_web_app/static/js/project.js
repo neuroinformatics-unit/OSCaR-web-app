@@ -1,6 +1,5 @@
 const addButton = document.querySelector("#add-genotype");
-const genotypeFormsContainer = document.querySelector("#genotype-forms");
-const genotypeForms = document.querySelectorAll(".genotype-form");
+const genotypeForms = document.querySelector("#genotype-forms");
 const totalForms = document.querySelector("#id_form-TOTAL_FORMS");
 const emptyTemplate = document.querySelector("#empty-form")
 
@@ -8,10 +7,9 @@ const emptyTemplate = document.querySelector("#empty-form")
 if (addButton) {
     addButton.addEventListener("click", addGenotype);
 }
-if (genotypeFormsContainer) {
-    genotypeFormsContainer.addEventListener("click", removeGenotype);
+if (genotypeForms) {
+    genotypeForms.addEventListener("click", removeGenotype);
 }
-genotypeForms.forEach(setupCountTypeToggle);
 
 // Add a new, empty genotype form to the genotypeForms container
 function addGenotype() {
@@ -26,7 +24,7 @@ function addGenotype() {
     });
     const genotypeForm = emptyForm.querySelector(".genotype-form");
 
-    genotypeFormsContainer.append(emptyForm);
+    genotypeForms.append(emptyForm);
     totalForms.value = nForms + 1;
     setupCountTypeToggle(genotypeForm);
 }
@@ -44,20 +42,4 @@ function removeGenotype(e) {
         deleteCheckbox.checked = true;
         row.classList.add("deleted");
     }
-}
-
-// Setup toggling of total count vs male / female count
-function setupCountTypeToggle(form) {
-  const typeDropdown = form.querySelector("select[name$='-count_type']");
-  const totalCount = form.querySelectorAll(".count-any-sex");
-  const maleFemaleCount = form.querySelectorAll(".count-specific-sex");
-
-  function sync() {
-    const countType = typeDropdown.value;
-    totalCount.forEach(el => el.classList.toggle("d-none", countType !== "any_sex"));
-    maleFemaleCount.forEach(el => el.classList.toggle("d-none", countType == "any_sex"));
-  }
-
-  typeDropdown.addEventListener("change", sync);
-  sync();
 }

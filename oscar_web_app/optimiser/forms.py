@@ -94,10 +94,12 @@ class GenotypeForm(forms.Form):
         self.helper.layout = Layout(
             Row(
                 *(Column(name) for name in self.mutation_names),
-                Column("count_type", css_class="col-md-2"),
-                Column("count_any_sex", css_class="col-md-2 count-any-sex"),
-                Column("count_males", css_class="col-md-1 d-none count-specific-sex"),
-                Column("count_females", css_class="col-md-1 d-none count-specific-sex"),
+                Column("count_type", css_class="col-xl-2 col-md-3"),
+                Column("count_any_sex", css_class="col-xl-2 col-md-4 count-any-sex"),
+                Column("count_males", css_class="col-xl-1 col-md-2 count-specific-sex"),
+                Column(
+                    "count_females", css_class="col-xl-1 col-md-2 count-specific-sex"
+                ),
                 Column(
                     StrictButton(
                         "X",

@@ -25,3 +25,8 @@
 .deleted {
   display: none;
 }
+
+.genotype-form:has(select[name$='-count_type'] option[value="any_sex"]:checked) .count-specific-sex,
+.genotype-form:has(select[name$='-count_type'] option[value="specific_sex"]:checked) .count-any-sex {
+    display: none;
+}
