@@ -1,5 +1,12 @@
 /* These styles are generated from project.scss. */
 
+:root {
+  --bs-primary: #6cbf5b;
+  --bs-primary-rgb: 108, 191, 91;
+  --bs-secondary: #1e3a5f;
+  --bs-secondary-rgb: 30, 58, 95
+}
+
 .alert-debug {
   color: black;
   background-color: white;
