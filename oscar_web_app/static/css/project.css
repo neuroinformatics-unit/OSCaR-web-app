@@ -7,6 +7,13 @@
   --bs-secondary-rgb: 30, 58, 95
 }
 
+.btn-secondary {
+    --bs-btn-bg: var(--bs-secondary);
+    --bs-btn-border-color: var(--bs-secondary);
+    --bs-btn-hover-bg: #112137;
+    --bs-btn-hover-border-color: #182f4e;
+}
+
 .alert-debug {
   color: black;
   background-color: white;
