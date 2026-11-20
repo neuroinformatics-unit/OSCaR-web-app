@@ -60,14 +60,32 @@ class GenotypeForm(forms.Form):
     """Form to specify required number of animals of one genotype"""
 
     count_any_sex = forms.IntegerField(label="# total", min_value=1, initial=1)
-    count_males = forms.IntegerField(label="# males", min_value=1, initial=1)
-    count_females = forms.IntegerField(label="# females", min_value=1, initial=1)
+    count_males = forms.IntegerField(label="# males", min_value=0, initial=1)
+    count_females = forms.IntegerField(label="# females", min_value=0, initial=1)
 
     count_type = forms.ChoiceField(
         choices=[("any_sex", "any sex"), ("specific_sex", "# males/females")],
         initial="any_sex",
         label="Required sex",
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if cleaned_data.get("count_type") == "any_sex":
+            return
+
+        n_males = cleaned_data.get("count_males")
+        n_females = cleaned_data.get("count_females")
+
+        if (n_males == 0) and (n_females == 0):
+            # Highlight male / female fields
+            self.add_error("count_males", "")
+            self.add_error("count_females", "")
+
+            # Show error message on top of form
+            msg = "Must request at least one animal per row"
+            raise ValidationError(msg)
 
     def __init__(self, *args, mutation_names: list[str] | None = None, **kwargs):
         """
