@@ -70,8 +70,9 @@ class GenotypeForm(forms.Form):
     )
 
     def clean(self):
-        cleaned_data = super().clean()
+        """Error if count_males AND count_females are 0 for this form."""
 
+        cleaned_data = super().clean()
         if cleaned_data.get("count_type") == "any_sex":
             return
 

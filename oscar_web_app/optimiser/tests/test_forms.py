@@ -1,6 +1,8 @@
 import pytest
+from pytest_django.asserts import assertFormError
 from pytest_django.asserts import assertFormSetError
 
+from oscar_web_app.optimiser.forms import GenotypeForm
 from oscar_web_app.optimiser.forms import GenotypeFormSet
 from oscar_web_app.optimiser.forms import LineForm
 from tests.helpers import create_formset_data
@@ -57,6 +59,32 @@ def test_line_form():
             ],
             ["Mut-A"],
             id="1 mutation (specific sex)",
+        ),
+        pytest.param(
+            [
+                {
+                    "Mut-A": "WT",
+                    "count_type": "specific_sex",
+                    "count_any_sex": 1,
+                    "count_males": 0,
+                    "count_females": 20,
+                },
+            ],
+            ["Mut-A"],
+            id="1 mutation (specific sex) - males zero",
+        ),
+        pytest.param(
+            [
+                {
+                    "Mut-A": "WT",
+                    "count_type": "specific_sex",
+                    "count_any_sex": 1,
+                    "count_males": 20,
+                    "count_females": 0,
+                },
+            ],
+            ["Mut-A"],
+            id="1 mutation (specific sex) - females zero",
         ),
         pytest.param(
             [
@@ -276,6 +304,7 @@ def test_valid_genotype_formsets(formset_params, mutation_names):
     ],
 )
 def test_invalid_genotype_formsets(formset_params, mutation_names, expected_msg):
+    """Check formset.non_form_errors are populated correctly."""
 
     formset_data = create_formset_data(formset_params)
     formset = GenotypeFormSet(
@@ -284,3 +313,20 @@ def test_invalid_genotype_formsets(formset_params, mutation_names, expected_msg)
     )
 
     assertFormSetError(formset, form_index=None, field=None, errors=[expected_msg])
+
+
+def test_invalid_genotype_forms():
+    """Check errors on individual forms are populated correctly."""
+
+    form_data = {
+        "Mut-A": "WT",
+        "count_type": "specific_sex",
+        "count_any_sex": 1,
+        "count_males": 0,
+        "count_females": 0,
+    }
+
+    form = GenotypeForm(form_data, mutation_names=["Mut-A"])
+    assertFormError(
+        form, field=None, errors=["Must request at least one animal per row"]
+    )
