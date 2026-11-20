@@ -1,3 +1,4 @@
+import math
 from typing import TYPE_CHECKING
 from typing import Any
 
@@ -218,15 +219,16 @@ def _create_schemes_context(
     )
     scheme_table = _convert_to_html_table(scheme_table)
 
-    surplus_summary_table = _convert_to_html_table(
-        surplus.create_summary_df(decimal_places)
-    )
     surplus_genotype_table = _convert_to_html_table(
         surplus.create_genotype_df(decimal_places)
     )
 
     return {
         "scheme_table": scheme_table,
-        "surplus_summary_table": surplus_summary_table,
+        "total_n": round(surplus.total_n, decimal_places),
+        "total_surplus": math.ceil(surplus.total_n_surplus),
+        # required_n is always a whole number, so int() to display like
+        # 35, rather than 35.0
+        "required_n": int(surplus.total_n - surplus.total_n_surplus),
         "surplus_genotype_table": surplus_genotype_table,
     }

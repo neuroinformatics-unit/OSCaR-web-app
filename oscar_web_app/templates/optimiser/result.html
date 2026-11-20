@@ -53,13 +53,13 @@
          aria-labelledby="scheme-summary-tab"
          tabindex="0">
       <div class="row justify-content-center my-4">
+        <div class="col-auto">{{ scheme_table | safe }}</div>
         <div class="col-auto">
-          <h3>Optimal schemes</h3>
-          {{ scheme_table | safe }}
-        </div>
-        <div class="col-auto">
-          <h3>Expected # animals</h3>
-          {{ surplus_summary_table | safe }}
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Required total: {{ required_n }}</li>
+            <li class="list-group-item">Expected total: {{ total_n }}</li>
+            <li class="list-group-item fw-bold">Expected surplus (rounded up): {{ total_surplus }}</li>
+          </ul>
         </div>
       </div>
     </div>
