@@ -1,3 +1,4 @@
+import math
 from http import HTTPStatus
 
 import pandas as pd
@@ -296,15 +297,15 @@ def test_select_genotypes_post(
     )
 
     # optimisation result context
+    assert context["total_n"] == round(surplus.total_n, 2)
+    assert context["total_surplus"] == math.ceil(surplus.total_n_surplus)
+    assert context["required_n"] == int(surplus.total_n - surplus.total_n_surplus)
+
     pd.testing.assert_frame_equal(
         convert_html_to_df(context["scheme_table"]),
         pd.DataFrame(
             breeding_schemes.items(), columns=("Scheme", "N matings"), dtype=str
         ),
-    )
-    pd.testing.assert_frame_equal(
-        convert_html_to_df(context["surplus_summary_table"]),
-        surplus.create_summary_df(decimal_places=2).astype(str),
     )
     pd.testing.assert_frame_equal(
         convert_html_to_df(context["surplus_genotype_table"]),
