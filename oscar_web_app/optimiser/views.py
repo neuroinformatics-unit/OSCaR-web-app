@@ -220,7 +220,9 @@ def _create_schemes_context(
     scheme_table = _convert_to_html_table(scheme_table)
 
     surplus_genotype_table = _convert_to_html_table(
-        surplus.create_genotype_df(decimal_places)
+        surplus.create_genotype_df(
+            decimal_places=decimal_places, round_up_total_surplus=True
+        )
     )
 
     return {

@@ -1657,18 +1657,14 @@ wheels = [
 
 [[package]]
 name = "oscar-colony"
-version = "0.0.11"
-source = { registry = "https://pypi.org/simple" }
+version = "0.0.12.dev2+gc72acbc5c"
+source = { git = "https://github.com/neuroinformatics-unit/OSCaR?rev=km%2Frounding#c72acbc5c375533409734991e60ab91bce8c1ea5" }
 dependencies = [
     { name = "fancylog", extra = ["git"] },
     { name = "numpy" },
     { name = "pandas" },
     { name = "requests" },
     { name = "scipy" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/38/44/89b88f525cfea2b1effc1c084d549ced8f2924702c01c6fa1a1d6cbbb2c2/oscar_colony-0.0.11.tar.gz", hash = "sha256:e26e30b6c9d5d9a3621f4ae676209ec5955b05dfcd530a4b4e8dc8105f37b243", size = 31053, upload-time = "2026-11-18T14:52:30.984Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/84/fb/2b7a54a50e42c66bb7eb9b27ebcf21ee6e2f199114065d7387b014ca308f/oscar_colony-0.0.11-py3-none-any.whl", hash = "sha256:8df4e01a894ae3a13aeb8dc82564be18c6f0efcdb986910889e2c918105e1e9d", size = 31745, upload-time = "2026-11-18T14:52:29.974Z" },
 ]
 
 [[package]]
@@ -1754,7 +1750,7 @@ requires-dist = [
     { name = "flower", specifier = "==2.2.0" },
     { name = "gunicorn", specifier = "==26.2.0" },
     { name = "hiredis", specifier = "==3.5.0" },
-    { name = "oscar-colony", specifier = "==0.0.11" },
+    { name = "oscar-colony", git = "https://github.com/neuroinformatics-unit/OSCaR?rev=km%2Frounding" },
     { name = "pillow", specifier = "==12.2.0" },
     { name = "psycopg", extras = ["binary"], marker = "sys_platform == 'win32'", specifier = "==3.3.4" },
     { name = "psycopg", extras = ["c"], marker = "sys_platform != 'win32'", specifier = "==3.3.4" },

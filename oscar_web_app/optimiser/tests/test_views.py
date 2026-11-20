@@ -309,5 +309,7 @@ def test_select_genotypes_post(
     )
     pd.testing.assert_frame_equal(
         convert_html_to_df(context["surplus_genotype_table"]),
-        surplus.create_genotype_df(decimal_places=2).astype(str),
+        surplus.create_genotype_df(
+            decimal_places=2, round_up_total_surplus=True
+        ).astype(str),
     )
