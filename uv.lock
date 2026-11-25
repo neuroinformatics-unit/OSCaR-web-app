@@ -1657,8 +1657,8 @@ wheels = [
 
 [[package]]
 name = "oscar-colony"
-version = "0.0.12.dev2+gc72acbc5c"
-source = { git = "https://github.com/neuroinformatics-unit/OSCaR?rev=km%2Frounding#c72acbc5c375533409734991e60ab91bce8c1ea5" }
+version = "0.0.12.dev6+gf06e5a2ad"
+source = { git = "https://github.com/neuroinformatics-unit/OSCaR?rev=km%2Frounding#f06e5a2ad5006618beb8c07eae9316e5925032a6" }
 dependencies = [
     { name = "fancylog", extra = ["git"] },
     { name = "numpy" },
