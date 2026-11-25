@@ -73,11 +73,11 @@ class GenotypeForm(forms.Form):
         """Error if count_males AND count_females are 0 for this form."""
 
         cleaned_data = super().clean()
-        if cleaned_data.get("count_type") == "any_sex":
+        if (cleaned_data is None) or (cleaned_data.get("count_type") != "specific_sex"):
             return
 
-        n_males = cleaned_data.get("count_males")
-        n_females = cleaned_data.get("count_females")
+        n_males = cleaned_data.get("count_males", 0)
+        n_females = cleaned_data.get("count_females", 0)
 
         if (n_males == 0) and (n_females == 0):
             # Highlight male / female fields
