@@ -7,6 +7,16 @@
   --bs-secondary-rgb: 30, 58, 95
 }
 
+.btn-primary {
+    --bs-btn-bg: var(--bs-primary);
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-hover-bg: #4D9E3D;
+    --bs-btn-hover-border-color: #489339;
+    --bs-btn-active-bg: #489339;
+    --bs-btn-active-border-color: #489339;
+    --bs-btn-color: #000000;
+}
+
 .btn-secondary {
     --bs-btn-bg: var(--bs-secondary);
     --bs-btn-border-color: var(--bs-secondary);
