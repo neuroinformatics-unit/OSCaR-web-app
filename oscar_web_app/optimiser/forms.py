@@ -1,7 +1,6 @@
 from crispy_forms.bootstrap import StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Column
-from crispy_forms.layout import Div
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Row
 from django import forms
@@ -44,11 +43,12 @@ class LineForm(forms.Form):
             {
                 "hx-post": reverse("optimiser:select_line"),
                 "hx-target": "#genotype-form-container",
+                "hx-indicator": "#spinner",
             }
         )
         self.helper = FormHelper()
         self.helper.layout = Layout(
-            Div(Column("line", css_class="col-md-7 mx-auto")),
+            Column("line", css_class="mx-auto"),
         )
 
 

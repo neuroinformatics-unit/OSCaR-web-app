@@ -15,6 +15,7 @@
     --bs-btn-active-bg: #489339;
     --bs-btn-active-border-color: #489339;
     --bs-btn-color: #000000;
+    --bs-btn-hover-color: #000000;
 }
 
 .btn-secondary {
@@ -58,4 +59,8 @@
 .genotype-form:has(select[name$='-count_type'] option[value="any_sex"]:checked) .count-specific-sex,
 .genotype-form:has(select[name$='-count_type'] option[value="specific_sex"]:checked) .count-any-sex {
     display: none;
+}
+
+.htmx-indicator {
+    opacity: 0;
 }

@@ -54,7 +54,7 @@
   <body class="{% block bodyclass %}{% endblock bodyclass %}">
     {% block body %}
       <div class="container-fluid">
-        <div class="row navbar bg-primary d-md-none">
+        <div class="row navbar bg-primary d-lg-none">
           <div class="container-fluid">
             <button class="navbar-toggler"
                     type="button"
@@ -67,7 +67,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="offcanvas-md offcanvas-start bg-primary col-auto align-self-start sticky-md-top vh-100 px-5"
+          <div class="offcanvas-lg offcanvas-start bg-primary col-auto align-self-start sticky-lg-top vh-100 px-5"
                tabindex="-1"
                id="sidebar"
                ,
@@ -86,7 +86,7 @@
               <img src="{% static 'images/oscar-logo.svg' %}"
                    alt="OSCaR logo"
                    height="50"
-                   class="d-none d-md-block my-3" />
+                   class="d-none d-lg-block my-3" />
               <ul class="nav flex-column">
                 <li class="nav-item active">
                   <a class="nav-link link-dark fs-5"
