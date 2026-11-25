@@ -54,58 +54,62 @@
   <body class="{% block bodyclass %}{% endblock bodyclass %}">
     {% block body %}
       <div class="container-fluid">
-        <div class="row">
-          <nav class="navbar bg-primary d-md-none">
-            <div class="container-fluid">
-              <button class="navbar-toggler"
-                      type="button"
-                      data-bs-toggle="offcanvas"
-                      data-bs-target="#sidebar"
-                      aria-controls="sidebar"
-                      aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-              </button>
-            </div>
-          </nav>
+        <div class="row navbar bg-primary d-md-none">
+          <div class="container-fluid">
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#sidebar"
+                    aria-controls="sidebar"
+                    aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          </div>
         </div>
         <div class="row">
           <div class="offcanvas-md offcanvas-start bg-primary col-auto align-self-start sticky-md-top vh-100 px-5"
                tabindex="-1"
                id="sidebar"
-               aria-labelledby="sidebarLabel">
+               ,
+               aria-label="Sidebar">
             <div class="offcanvas-header">
-              <h5 class="offcanvas-title" id="sidebarLabel">Offcanvas</h5>
+              <img src="{% static 'images/oscar-logo.svg' %}"
+                   alt="OSCaR logo"
+                   height="50" />
               <button type="button"
-                      class="btn-close"
+                      class="btn-close ms-auto"
                       data-bs-dismiss="offcanvas"
                       data-bs-target="#sidebar"
                       aria-label="Close"></button>
             </div>
-            <div class="offcanvas-body d-flex flex-column">
-              <ul class="navbar-nav justify-content-end flex-column">
+            <nav class="offcanvas-body flex-column px-0 pt-3">
+              <img src="{% static 'images/oscar-logo.svg' %}"
+                   alt="OSCaR logo"
+                   height="50"
+                   class="d-none d-md-block my-3" />
+              <ul class="nav flex-column">
                 <li class="nav-item active">
-                  <a class="nav-link" href="{% url 'home' %}">Home <span class="visually-hidden">(current)</span></a>
+                  <a class="nav-link link-dark"
+                     href="{% url 'optimiser:select_line' %}">Breeding Plan<span class="visually-hidden">(current)</span></a>
                 </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'about' %}">About</a>
+                <li class="nav-item border-top border-secondary">
+                  <a class="nav-link link-dark" href="{% url 'about' %}">Historical Data and Statistics</a>
+                </li>
+                <li class="nav-item border-top border-secondary">
+                  <a class="nav-link link-dark" href="{% url 'about' %}">Validation</a>
+                </li>
+                <li class="nav-item border-top border-secondary">
+                  <a class="nav-link link-dark" href="{% url 'about' %}">Rules Hierarchy</a>
                 </li>
                 {% if request.user.is_authenticated %}
                   <li class="nav-item">
                     {# URL provided by django-allauth/account/urls.py #}
-                    <a class="nav-link" href="{% url 'account_logout' %}">{% translate "Sign Out" %}</a>
+                    <a class="nav-link link-dark border-top border-secondary"
+                       href="{% url 'account_logout' %}">{% translate "Sign Out" %}</a>
                   </li>
-                {% else %}
-                  {% if ACCOUNT_ALLOW_REGISTRATION %}
-                    <li class="nav-item">
-                      {# URL provided by django-allauth/account/urls.py #}
-                      <a id="sign-up-link"
-                         class="nav-link"
-                         href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
-                    </li>
-                  {% endif %}
                 {% endif %}
               </ul>
-            </div>
+            </nav>
           </div>
           <div class="col">
             {% if messages %}
