@@ -4,7 +4,8 @@
 <form action=""
       method="post"
       hx-post="{{ request.path }}"
-      hx-target="#results-section">
+      hx-target="#results-section"
+      hx-indicator="#results-spinner">
   {% csrf_token %}
   {{ formset.management_form }}
   {% comment %} Display any formset errors {% endcomment %}

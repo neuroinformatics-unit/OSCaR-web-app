@@ -35,7 +35,7 @@ def select_line(request: HttpRequest) -> HttpResponse:
     else:
         form = LineForm()
 
-    return render(request, "optimiser/select_line.html", {"form": form})
+    return render(request, "optimiser/breeding_plan.html", {"form": form})
 
 
 def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:

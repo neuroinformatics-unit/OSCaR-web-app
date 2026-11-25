@@ -43,7 +43,7 @@ class LineForm(forms.Form):
             {
                 "hx-post": reverse("optimiser:select_line"),
                 "hx-target": "#genotype-form-container",
-                "hx-indicator": "#spinner",
+                "hx-indicator": "#genotypes-spinner",
             }
         )
         self.helper = FormHelper()

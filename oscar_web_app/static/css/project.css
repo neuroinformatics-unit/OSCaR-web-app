@@ -64,3 +64,7 @@
 .htmx-indicator {
     opacity: 0;
 }
+
+.panel-with-spinner {
+  min-height: 150px;
+}
