@@ -55,16 +55,45 @@ class LineForm(forms.Form):
 class GenotypeForm(forms.Form):
     """Form to specify required number of animals of one genotype"""
 
-    count = forms.IntegerField(min_value=1, initial=1)
+    count_any_sex = forms.IntegerField(label="# total", min_value=1, initial=1)
+    count_males = forms.IntegerField(label="# males", min_value=0, initial=1)
+    count_females = forms.IntegerField(label="# females", min_value=0, initial=1)
 
-    def __init__(self, *args, mutation_names=None, **kwargs):
+    count_type = forms.ChoiceField(
+        choices=[("any_sex", "any sex"), ("specific_sex", "# males/females")],
+        initial="any_sex",
+        label="Required sex",
+    )
+
+    def clean(self):
+        """Error if count_males AND count_females are 0 for this form."""
+
+        cleaned_data = super().clean()
+        if (cleaned_data is None) or (cleaned_data.get("count_type") != "specific_sex"):
+            return
+
+        n_males = cleaned_data.get("count_males", 0)
+        n_females = cleaned_data.get("count_females", 0)
+
+        if (n_males == 0) and (n_females == 0):
+            # Highlight male / female fields
+            self.add_error("count_males", "")
+            self.add_error("count_females", "")
+
+            # Show error message on top of form
+            msg = "Must request at least one animal per row"
+            raise ValidationError(msg)
+
+    def __init__(self, *args, mutation_names: list[str] | None = None, **kwargs):
+        """
+        Create a ChoiceField for each provided mutation_name and setup form
+        layout.
+        """
         super().__init__(*args, **kwargs)
-
-        if mutation_names is None:
-            mutation_names = []
+        self.mutation_names = mutation_names if mutation_names is not None else []
 
         # mutations is a kwarg
-        for mutation_name in mutation_names:
+        for mutation_name in self.mutation_names:
             self.fields[mutation_name] = forms.ChoiceField(
                 label=mutation_name,
                 choices=(
@@ -79,8 +108,13 @@ class GenotypeForm(forms.Form):
         self.helper.disable_csrf = True
         self.helper.layout = Layout(
             Row(
-                *(Column(name) for name in mutation_names),
-                Column("count", css_class="col-md-2"),
+                *(Column(name) for name in self.mutation_names),
+                Column("count_type", css_class="col-xl-2 col-md-3"),
+                Column("count_any_sex", css_class="col-xl-2 col-md-4 count-any-sex"),
+                Column("count_males", css_class="col-xl-1 col-md-2 count-specific-sex"),
+                Column(
+                    "count_females", css_class="col-xl-1 col-md-2 count-specific-sex"
+                ),
                 Column(
                     StrictButton(
                         "X",
@@ -90,7 +124,7 @@ class GenotypeForm(forms.Form):
                     css_class="col-md-1 mb-3 d-flex align-items-end",
                 ),
                 Column("DELETE", css_class="d-none"),  # Hide django's deletion checkbox
-                css_class="bg-light rounded-4 p-1 my-2",
+                css_class="genotype-form bg-light rounded-4 p-1 my-2",
             )
         )
 
@@ -106,11 +140,7 @@ class BaseGenotypeFormset(BaseFormSet):
             return
 
         genotypes = set()
-        mutation_fields = [
-            field_name
-            for field_name in self.forms[0].cleaned_data
-            if field_name not in ["count", "DELETE"]
-        ]
+        mutation_fields = self.forms[0].mutation_names
 
         for form in self.forms:
             # ignore forms marked for deletion

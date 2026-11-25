@@ -10,6 +10,7 @@ from oscar_web_app.optimiser.colony_management import ColonyPyRAT
 from oscar_web_app.optimiser.colony_management import get_colony
 from oscar_web_app.optimiser.forms import GenotypeFormSet
 from tests.helpers import assert_dataclass_equal
+from tests.helpers import create_formset_data
 from tests.pooch_test_data import pooch_data_path
 
 
@@ -45,15 +46,18 @@ def test_optimise_invalid_scheme():
     # line statistics with default, empty values
     line_stats = LineStatistics(line_name=line_name, mutations=mutation_names)
 
-    # formset asking for 5 WT
-    formset_data = {
-        "form-TOTAL_FORMS": 1,
-        "form-INITIAL_FORMS": 0,
-        "form-MIN_NUM_FORMS": 1,
-        "form-MAX_NUM_FORMS": 1000,
-        "form-0-Mut-A": "WT",
-        "form-0-count": 5,
-    }
+    # formset asking for 5 WT of any sex
+    formset_data = create_formset_data(
+        [
+            {
+                "Mut-A": "WT",
+                "count_type": "any_sex",
+                "count_any_sex": 5,
+                "count_males": 1,
+                "count_females": 1,
+            }
+        ]
+    )
     formset = GenotypeFormSet(
         formset_data,
         form_kwargs={"mutation_names": mutation_names},

@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = "==3.14.*"
 resolution-markers = [
     "sys_platform == 'win32'",
@@ -1657,18 +1657,14 @@ wheels = [
 
 [[package]]
 name = "oscar-colony"
-version = "0.0.9"
-source = { registry = "https://pypi.org/simple" }
+version = "0.0.12.dev6+gf06e5a2ad"
+source = { git = "https://github.com/neuroinformatics-unit/OSCaR?rev=km%2Frounding#f06e5a2ad5006618beb8c07eae9316e5925032a6" }
 dependencies = [
     { name = "fancylog", extra = ["git"] },
     { name = "numpy" },
     { name = "pandas" },
     { name = "requests" },
     { name = "scipy" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/b8/96/fe227a7dc7b6339e233b5b7b0acb0d19b97a341fd2be1d2348f63dc78990/oscar_colony-0.0.9.tar.gz", hash = "sha256:bde4e1de93091652a26349f80a392207a728d76bd3f67c5a3c7cd8ee504eb023", size = 27200, upload-time = "2026-08-07T07:45:44.17Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/bc/85/5797cac42aa27b5570db85d3d4b1181d487d9327bbe55e73a3a4a3d4fe0e/oscar_colony-0.0.9-py3-none-any.whl", hash = "sha256:756e94d48dba65548b1aba7971fdefa3fdc102dfaa79a1124ceb63f038c42a86", size = 27477, upload-time = "2026-08-07T07:45:43.103Z" },
 ]
 
 [[package]]
@@ -1754,7 +1750,7 @@ requires-dist = [
     { name = "flower", specifier = "==2.2.0" },
     { name = "gunicorn", specifier = "==26.2.0" },
     { name = "hiredis", specifier = "==3.5.0" },
-    { name = "oscar-colony", specifier = "==0.0.9" },
+    { name = "oscar-colony", git = "https://github.com/neuroinformatics-unit/OSCaR?rev=km%2Frounding" },
     { name = "pillow", specifier = "==12.2.0" },
     { name = "psycopg", extras = ["binary"], marker = "sys_platform == 'win32'", specifier = "==3.3.4" },
     { name = "psycopg", extras = ["c"], marker = "sys_platform != 'win32'", specifier = "==3.3.4" },
@@ -1869,7 +1865,7 @@ name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ptyprocess" },
+    { name = "ptyprocess", marker = "sys_platform != 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [
@@ -2014,10 +2010,10 @@ wheels = [
 
 [package.optional-dependencies]
 binary = [
-    { name = "psycopg-binary", marker = "implementation_name != 'pypy'" },
+    { name = "psycopg-binary", marker = "implementation_name != 'pypy' and sys_platform == 'win32'" },
 ]
 c = [
-    { name = "psycopg-c", marker = "implementation_name != 'pypy'" },
+    { name = "psycopg-c", marker = "implementation_name != 'pypy' and sys_platform != 'win32'" },
 ]
 
 [[package]]

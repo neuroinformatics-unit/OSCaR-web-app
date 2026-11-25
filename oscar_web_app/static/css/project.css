@@ -40,10 +40,11 @@
     display: none;
 }
 
-.errorlist {
+.errorlist, .alert-block.alert-danger ul {
     list-style: none;
     margin: 0;
-    padding: 0
+    padding: 0;
+    text-align: center;
 }
 
 .deleted {
@@ -52,4 +53,9 @@
 
 .nav-link:hover {
   background-color: rgba(255, 255, 255, 0.15);
+}
+
+.genotype-form:has(select[name$='-count_type'] option[value="any_sex"]:checked) .count-specific-sex,
+.genotype-form:has(select[name$='-count_type'] option[value="specific_sex"]:checked) .count-any-sex {
+    display: none;
 }
