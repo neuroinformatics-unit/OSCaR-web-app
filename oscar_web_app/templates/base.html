@@ -93,13 +93,15 @@
                      href="{% url 'optimiser:select_line' %}">Breeding Plan<span class="visually-hidden">(current)</span></a>
                 </li>
                 <li class="nav-item border-top border-secondary">
-                  <a class="nav-link link-dark fs-5" href="{% url 'about' %}">Historical Data and Statistics</a>
+                  <a class="nav-link link-dark fs-5"
+                     href="{% url 'optimiser:line_stats' %}">Historical Data and Statistics</a>
                 </li>
                 <li class="nav-item border-top border-secondary">
-                  <a class="nav-link link-dark fs-5" href="{% url 'about' %}">Validation</a>
+                  <a class="nav-link link-dark fs-5"
+                     href="{% url 'optimiser:validation' %}">Validation</a>
                 </li>
                 <li class="nav-item border-top border-secondary">
-                  <a class="nav-link link-dark fs-5" href="{% url 'about' %}">Rules Hierarchy</a>
+                  <a class="nav-link link-dark fs-5" href="{% url 'optimiser:rules' %}">Rules Hierarchy</a>
                 </li>
                 {% if request.user.is_authenticated %}
                   <li class="nav-item">
