@@ -60,7 +60,7 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
                 line_name = get_colony().get_line_name(line_id)
 
             # Run optimisation calculations and render the results
-            context = _create_optimisation_result_context(line_name, formset)
+            context = _create_optimisation_result_context(request, line_name, formset)
             return render(
                 request,
                 "optimiser/optimisation_result.html",
@@ -134,7 +134,10 @@ def _convert_to_html_table(
 
 
 def _create_optimisation_result_context(
-    line_name: str, formset: BaseFormSet[GenotypeForm], decimal_places: int = 2
+    request: HttpRequest,
+    line_name: str,
+    formset: BaseFormSet[GenotypeForm],
+    decimal_places: int = 2,
 ) -> dict[str, Any]:
     """
     Run the optimisation calculations for the given line_name, and create
@@ -155,7 +158,13 @@ def _create_optimisation_result_context(
         Context required for results page
     """
     colony_management = get_colony()
-    line_stats = colony_management.get_line_stats(line_name)
+    line_stats, error_msg = colony_management.get_line_stats(line_name)
+
+    if error_msg is not None:
+        messages.error(request, error_msg)
+    if line_stats is None:
+        return None
+
     schemes, surplus = colony_management.optimise_schemes(line_stats, formset)
 
     # Convert breeding schemes into a table for easier viewing
