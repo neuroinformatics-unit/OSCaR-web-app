@@ -1,73 +1,77 @@
 <h2 class="mb-3">Historical statistics for the line</h2>
-<ul class="nav nav-tabs" role="tablist">
-  <li class="nav-item" role="presentation">
-    <button class="nav-link active"
-            id="stats-line-tab"
-            data-bs-toggle="tab"
-            data-bs-target="#stats-line-tab-pane"
-            type="button"
-            role="tab"
-            aria-controls="stats-line-tab-pane"
-            aria-selected="true">By Line</button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link"
-            id="stats-genotype-tab"
-            data-bs-toggle="tab"
-            data-bs-target="#stats-genotype-tab-pane"
-            type="button"
-            role="tab"
-            aria-controls="stats-genotype-tab-pane"
-            aria-selected="false">By Genotype</button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link"
-            id="stats-scheme-tab"
-            data-bs-toggle="tab"
-            data-bs-target="#stats-scheme-tab-pane"
-            type="button"
-            role="tab"
-            aria-controls="stats-scheme-tab-pane"
-            aria-selected="false">By Scheme</button>
-  </li>
-</ul>
-<div class="tab-content">
-  {% comment %} Historical stats by line tab content {% endcomment %}
-  <div class="tab-pane fade show active"
-       id="stats-line-tab-pane"
-       role="tabpanel"
-       aria-labelledby="stats-line-tab"
-       tabindex="0">
-    <ul class="list-group list-group-flush my-4">
-      <li class="list-group-item">Total offspring: {{ stats_total_n }}</li>
-      <li class="list-group-item">Total genotyped offspring: {{ stats_genotyped_n }}</li>
-      <li class="list-group-item">Total sexed offspring: {{ stats_sexed_n }}</li>
-      <li class="list-group-item">Total successful matings: {{ stats_matings_n }}</li>
-      <li class="list-group-item">Average litter size: {{ stats_litter_size }}</li>
-      <li class="list-group-item">Proportion male offspring: {{ stats_proportion_male }}</li>
-    </ul>
-  </div>
-  {% comment %} Historical stats by genotype tab content {% endcomment %}
-  <div class="tab-pane fade"
-       id="stats-genotype-tab-pane"
-       role="tabpanel"
-       aria-labelledby="stats-genotype-tab"
-       tabindex="0">
-    <div class="row justify-content-center my-4">
-      <div class="col-md-8 table-responsive">{{ stats_genotype_table | safe }}</div>
+{% include "messages.html" %}
+{% comment %} Only render stats if they were calculate successfully {% endcomment %}
+{% if stats_total_n %}
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active"
+              id="stats-line-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#stats-line-tab-pane"
+              type="button"
+              role="tab"
+              aria-controls="stats-line-tab-pane"
+              aria-selected="true">By Line</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link"
+              id="stats-genotype-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#stats-genotype-tab-pane"
+              type="button"
+              role="tab"
+              aria-controls="stats-genotype-tab-pane"
+              aria-selected="false">By Genotype</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link"
+              id="stats-scheme-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#stats-scheme-tab-pane"
+              type="button"
+              role="tab"
+              aria-controls="stats-scheme-tab-pane"
+              aria-selected="false">By Scheme</button>
+    </li>
+  </ul>
+  <div class="tab-content">
+    {% comment %} Historical stats by line tab content {% endcomment %}
+    <div class="tab-pane fade show active"
+         id="stats-line-tab-pane"
+         role="tabpanel"
+         aria-labelledby="stats-line-tab"
+         tabindex="0">
+      <ul class="list-group list-group-flush my-4">
+        <li class="list-group-item">Total offspring: {{ stats_total_n }}</li>
+        <li class="list-group-item">Total genotyped offspring: {{ stats_genotyped_n }}</li>
+        <li class="list-group-item">Total sexed offspring: {{ stats_sexed_n }}</li>
+        <li class="list-group-item">Total successful matings: {{ stats_matings_n }}</li>
+        <li class="list-group-item">Average litter size: {{ stats_litter_size }}</li>
+        <li class="list-group-item">Proportion male offspring: {{ stats_proportion_male }}</li>
+      </ul>
+    </div>
+    {% comment %} Historical stats by genotype tab content {% endcomment %}
+    <div class="tab-pane fade"
+         id="stats-genotype-tab-pane"
+         role="tabpanel"
+         aria-labelledby="stats-genotype-tab"
+         tabindex="0">
+      <div class="row justify-content-center my-4">
+        <div class="col-md-8 table-responsive">{{ stats_genotype_table | safe }}</div>
+      </div>
+    </div>
+    {% comment %} Historical stats by scheme tab content {% endcomment %}
+    <div class="tab-pane fade"
+         id="stats-scheme-tab-pane"
+         role="tabpanel"
+         aria-labelledby="stats-scheme-tab"
+         tabindex="0">
+      <h3 class="my-4">Overall stats per scheme</h3>
+      <div class="table-responsive">{{ stats_scheme_summary_table | safe }}</div>
+      <h3 class="my-4">Number of offspring per scheme</h3>
+      <div class="table-responsive">{{ stats_scheme_number_table | safe }}</div>
+      <h3 class="my-4">Proportion of offspring per scheme</h3>
+      <div class="table-responsive">{{ stats_scheme_proportion_table | safe }}</div>
     </div>
   </div>
-  {% comment %} Historical stats by scheme tab content {% endcomment %}
-  <div class="tab-pane fade"
-       id="stats-scheme-tab-pane"
-       role="tabpanel"
-       aria-labelledby="stats-scheme-tab"
-       tabindex="0">
-    <h3 class="my-4">Overall stats per scheme</h3>
-    <div class="table-responsive">{{ stats_scheme_summary_table | safe }}</div>
-    <h3 class="my-4">Number of offspring per scheme</h3>
-    <div class="table-responsive">{{ stats_scheme_number_table | safe }}</div>
-    <h3 class="my-4">Proportion of offspring per scheme</h3>
-    <div class="table-responsive">{{ stats_scheme_proportion_table | safe }}</div>
-  </div>
-</div>
+{% endif %}

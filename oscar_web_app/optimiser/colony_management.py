@@ -166,8 +166,8 @@ class ColonyPyRAT(ColonyManagement):
         line_name: str,
         start_date: date | None = None,
         end_date: date | None = None,
-    ) -> LineStatistics:
-        """Get historical stats for the given line"""
+    ) -> tuple[LineStatistics | None, str | None]:
+        """Get historical stats for the given line, and record any error messages."""
 
         # Fetch all available animal data for the line
         animal_data = get_pyrat_data(
@@ -182,18 +182,25 @@ class ColonyPyRAT(ColonyManagement):
         for animal_df in animal_data:
             if len(standardised_dfs) == 0 and animal_df.empty:
                 msg = "No animals found for chosen line"
-                raise Http404(msg)
+                if start_date and end_date:
+                    msg += (
+                        f" between {start_date.isoformat()} and {end_date.isoformat()}."
+                    )
+                elif start_date:
+                    msg += f" after {start_date.isoformat()}"
+                elif end_date:
+                    msg += f" before {end_date.isoformat()}"
+                return None, msg
 
             standard_df = standardise_pyrat_csv(animal_df)
             standardised_dfs.append(standard_df)
 
         merged_df = pd.concat(standardised_dfs)
         if merged_df.empty:
-            msg = "No animals remain for chosen line after standardisation"
-            raise Http404(msg)
+            return None, "No animals remain for chosen line after standardisation"
 
         # Calculate historical stats across all standardised data
-        return calculate_historical_stats_for_line(merged_df, line_name)
+        return calculate_historical_stats_for_line(merged_df, line_name), None
 
 
 class ColonyDev(ColonyManagement):

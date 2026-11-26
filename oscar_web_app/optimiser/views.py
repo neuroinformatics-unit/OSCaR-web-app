@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from typing import Any
 
 import pandas as pd
+from django.contrib import messages
 from django.http import Http404
 from django.http import HttpRequest
 from django.http import HttpResponse
@@ -80,7 +81,7 @@ def line_statistics(request: HttpRequest) -> HttpResponse:
         form = LineStatisticsForm(request.POST)
         if form.is_valid():
             # Run line statistics calculations and render the results
-            context = _create_line_stats_context(form)
+            context = _create_line_stats_context(request, form)
             return render(
                 request,
                 "optimiser/line_stats_result.html",
@@ -183,7 +184,7 @@ def _create_optimisation_result_context(
 
 
 def _create_line_stats_context(
-    line_stats_form: LineStatisticsForm, decimal_places: int = 2
+    request: HttpRequest, line_stats_form: LineStatisticsForm, decimal_places: int = 2
 ) -> dict[str, Any]:
     """
     Run line statistics calculations, and create a context dict with required
@@ -207,9 +208,14 @@ def _create_line_stats_context(
     end_date = line_stats_form.cleaned_data["end_date"]
 
     colony_management = get_colony()
-    line_stats = colony_management.get_line_stats(
+    line_stats, error_msg = colony_management.get_line_stats(
         line_name=line_name, start_date=start_date, end_date=end_date
     )
+
+    if error_msg is not None:
+        messages.error(request, error_msg)
+    if line_stats is None:
+        return None
 
     n_per_genotype_df = _convert_to_html_table(line_stats.create_n_per_genotype_df())
     scheme_summary_df = _convert_to_html_table(
@@ -223,8 +229,6 @@ def _create_line_stats_context(
     )
 
     return {
-        "line_name": line_stats.line_name,
-        "mutations": line_stats.mutations,
         "stats_total_n": line_stats.total_n_offspring,
         "stats_genotyped_n": line_stats.total_n_genotyped_offspring,
         "stats_sexed_n": line_stats.total_n_sexed_offspring,

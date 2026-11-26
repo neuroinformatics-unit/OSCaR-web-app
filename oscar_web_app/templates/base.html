@@ -114,17 +114,7 @@
             </nav>
           </div>
           <div class="col mx-2">
-            {% if messages %}
-              {% for message in messages %}
-                <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                  {{ message }}
-                  <button type="button"
-                          class="btn-close"
-                          data-bs-dismiss="alert"
-                          aria-label="Close"></button>
-                </div>
-              {% endfor %}
-            {% endif %}
+            {% include "messages.html" %}
             {% block main %}
               {% block content %}
                 <p>Use this document as a way to quick start any new project.</p>
