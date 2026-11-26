@@ -23,6 +23,7 @@ from oscar_colony.optimise.surplus_summary import SexSplit
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Iterator
+    from datetime import date
 
     from django.forms import BaseFormSet
 
@@ -75,7 +76,12 @@ class ColonyManagement(ABC):
         """Get names of mutations for the given line"""
 
     @abstractmethod
-    def get_line_stats(self, line_name: str) -> LineStatistics:
+    def get_line_stats(
+        self,
+        line_name: str,
+        start_date: date | None = None,
+        end_date: date | None = None,
+    ) -> LineStatistics:
         """Get historical stats for the given line"""
 
     def optimise_schemes(
@@ -155,13 +161,20 @@ class ColonyPyRAT(ColonyManagement):
 
         return get_pyrat_line_mutations(line_id)
 
-    def get_line_stats(self, line_name: str) -> LineStatistics:
+    def get_line_stats(
+        self,
+        line_name: str,
+        start_date: date | None = None,
+        end_date: date | None = None,
+    ) -> LineStatistics:
         """Get historical stats for the given line"""
 
-        # Fetch all available animal data for the line (no date restrictions)
+        # Fetch all available animal data for the line
         animal_data = get_pyrat_data(
             species_name="Mouse",
             line_name=line_name,
+            birth_date_from=start_date,
+            birth_date_to=end_date,
         )
 
         # Standardise all fetched data
@@ -528,7 +541,12 @@ class ColonyDev(ColonyManagement):
 
         return self._line_id_to_stats[line_id].mutations
 
-    def get_line_stats(self, line_name: str) -> LineStatistics:
+    def get_line_stats(
+        self,
+        line_name: str,
+        start_date: date | None = None,
+        end_date: date | None = None,
+    ) -> LineStatistics:
         """Get historical stats for the given line"""
 
         for line_stats in self._line_id_to_stats.values():

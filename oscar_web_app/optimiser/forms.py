@@ -15,8 +15,20 @@ from django.utils import timezone
 from .colony_management import get_colony
 
 
-def _fetch_line_choices():
-    """Fetch available line choices to populate dropdown menu"""
+def _fetch_line_choices(*, return_ids: bool = True) -> list[tuple[int | str, str]]:
+    """Fetch available line choices to populate dropdown menu
+
+    Parameters
+    ----------
+    return_ids : bool, optional
+        When true, return the line ids as the values. Otherwise, return
+        line names.
+
+    Returns
+    -------
+    list[tuple[int | str, str]
+        A list of (returned_value, displayed_value) pairs
+    """
 
     # Start with an empty default choice
     lines = [("", "--------")]
@@ -24,7 +36,10 @@ def _fetch_line_choices():
     for line_df in get_colony().get_lines():
         if not line_df.empty:
             lines.extend(
-                [(row.id, row.name) for row in line_df.itertuples(index=False)]
+                [
+                    (row.id, row.name) if return_ids else (row.name, row.name)
+                    for row in line_df.itertuples(index=False)
+                ]
             )
 
     return lines
@@ -35,7 +50,7 @@ class LineForm(forms.Form):
 
     line = forms.ChoiceField(
         label="Line name",
-        choices=_fetch_line_choices,
+        choices=_fetch_line_choices(return_ids=True),
         required=True,
     )
 
@@ -59,7 +74,7 @@ class LineStatisticsForm(forms.Form):
 
     line = forms.ChoiceField(
         label="Line name",
-        choices=_fetch_line_choices,
+        choices=_fetch_line_choices(return_ids=False),
         required=True,
     )
 
@@ -83,6 +98,11 @@ class LineStatisticsForm(forms.Form):
             self.fields[field].widget.attrs["max"] = today
 
         self.helper = FormHelper()
+        self.helper.attrs = {
+            "hx-post": reverse("optimiser:line_stats"),
+            "hx-target": "#line-stats-container",
+            "hx-indicator": "#line-stats-spinner",
+        }
         self.helper.layout = Layout(
             Row(
                 Column("line", css_class="col-md-4"),

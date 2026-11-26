@@ -15,10 +15,6 @@ from .forms import LineForm
 from .forms import LineStatisticsForm
 
 if TYPE_CHECKING:
-    from oscar_colony.breeding_scheme import BreedingScheme
-    from oscar_colony.historical_stats import LineStatistics
-    from oscar_colony.optimise.surplus_summary import SurplusSummary
-
     from .colony_management import BaseFormSet
     from .colony_management import GenotypeForm
 
@@ -63,7 +59,7 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
                 line_name = get_colony().get_line_name(line_id)
 
             # Run optimisation calculations and render the results
-            context = _create_result_page_context(line_name, formset)
+            context = _create_optimisation_result_context(line_name, formset)
             return render(
                 request,
                 "optimiser/optimisation_result.html",
@@ -83,8 +79,13 @@ def line_statistics(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = LineStatisticsForm(request.POST)
         if form.is_valid():
-            # DO STUFF
-            pass
+            # Run line statistics calculations and render the results
+            context = _create_line_stats_context(form)
+            return render(
+                request,
+                "optimiser/line_stats_result.html",
+                context,
+            )
     else:
         form = LineStatisticsForm()
 
@@ -131,8 +132,8 @@ def _convert_to_html_table(
     )
 
 
-def _create_result_page_context(
-    line_name: str, formset: BaseFormSet[GenotypeForm]
+def _create_optimisation_result_context(
+    line_name: str, formset: BaseFormSet[GenotypeForm], decimal_places: int = 2
 ) -> dict[str, Any]:
     """
     Run the optimisation calculations for the given line_name, and create
@@ -144,6 +145,8 @@ def _create_result_page_context(
         Name of the line
     formset : GenotypeFormSet
         The completed genotype formset for this line
+    decimal_places: int
+        Number of decimal places to round values to.
 
     Returns
     -------
@@ -154,29 +157,59 @@ def _create_result_page_context(
     line_stats = colony_management.get_line_stats(line_name)
     schemes, surplus = colony_management.optimise_schemes(line_stats, formset)
 
-    stats_context = _create_line_stats_context(line_stats)
-    scheme_context = _create_schemes_context(schemes, surplus)
+    # Convert breeding schemes into a table for easier viewing
+    scheme_table = pd.DataFrame(
+        schemes.items(),
+        columns=("Scheme", "N matings"),
+        dtype=str,
+    )
+    scheme_table = _convert_to_html_table(scheme_table)
 
-    return stats_context | scheme_context
+    surplus_genotype_table = _convert_to_html_table(
+        surplus.create_genotype_df(
+            decimal_places=decimal_places, round_up_total_surplus=True
+        )
+    )
+
+    return {
+        "scheme_table": scheme_table,
+        "total_n": round(surplus.total_n, decimal_places),
+        "total_surplus": math.ceil(surplus.total_n_surplus),
+        # required_n is always a whole number, so int() to display like
+        # 35, rather than 35.0
+        "required_n": int(surplus.total_n - surplus.total_n_surplus),
+        "surplus_genotype_table": surplus_genotype_table,
+    }
 
 
 def _create_line_stats_context(
-    line_stats: LineStatistics, decimal_places: int = 2
+    line_stats_form: LineStatisticsForm, decimal_places: int = 2
 ) -> dict[str, Any]:
-    """Create context with values from the given LineStatistics.
+    """
+    Run line statistics calculations, and create a context dict with required
+    values for the results page.
 
     Parameters
     ----------
-    line_stats : LineStatistics
-        Historical stats for the line.
-    decimal_places : int, optional
-        Number of decimal places to round values to.
+    line_stats_form : LineStatisticsForm
+        The completed line statistics form
+    decimal_places: int
+            Number of decimal places to round values to.
 
     Returns
     -------
     dict[str, Any]
-        Context dict
+        Context dict for line statistics results
     """
+
+    line_name = line_stats_form.cleaned_data["line"]
+    start_date = line_stats_form.cleaned_data["start_date"]
+    end_date = line_stats_form.cleaned_data["end_date"]
+
+    colony_management = get_colony()
+    line_stats = colony_management.get_line_stats(
+        line_name=line_name, start_date=start_date, end_date=end_date
+    )
 
     n_per_genotype_df = _convert_to_html_table(line_stats.create_n_per_genotype_df())
     scheme_summary_df = _convert_to_html_table(
@@ -202,49 +235,4 @@ def _create_line_stats_context(
         "stats_scheme_summary_table": scheme_summary_df,
         "stats_scheme_number_table": scheme_number_df,
         "stats_scheme_proportion_table": scheme_proportion_df,
-    }
-
-
-def _create_schemes_context(
-    schemes: dict[BreedingScheme, int], surplus: SurplusSummary, decimal_places: int = 2
-) -> dict[str, Any]:
-    """Create context with values from calculated breeding schemes / surplus.
-
-    Parameters
-    ----------
-    schemes : dict[BreedingScheme, int]
-        Calculated breeding schemes
-    surplus : SurplusSummary
-        Calculated surplus
-    decimal_places : int, optional
-        Number of decimal places to round values to.
-
-    Returns
-    -------
-    dict[str, Any]
-        Context dict
-    """
-
-    # Convert breeding schemes into a table for easier viewing
-    scheme_table = pd.DataFrame(
-        schemes.items(),
-        columns=("Scheme", "N matings"),
-        dtype=str,
-    )
-    scheme_table = _convert_to_html_table(scheme_table)
-
-    surplus_genotype_table = _convert_to_html_table(
-        surplus.create_genotype_df(
-            decimal_places=decimal_places, round_up_total_surplus=True
-        )
-    )
-
-    return {
-        "scheme_table": scheme_table,
-        "total_n": round(surplus.total_n, decimal_places),
-        "total_surplus": math.ceil(surplus.total_n_surplus),
-        # required_n is always a whole number, so int() to display like
-        # 35, rather than 35.0
-        "required_n": int(surplus.total_n - surplus.total_n_surplus),
-        "surplus_genotype_table": surplus_genotype_table,
     }
