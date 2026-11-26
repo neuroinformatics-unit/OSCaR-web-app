@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block title %}Line statistics{% endblock title %}
 {% block content %}
-  <h1 class="mt-5">Line statistics placeholder</h1>
+  {% crispy form %}
 {% endblock content %}

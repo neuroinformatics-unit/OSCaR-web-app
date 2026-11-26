@@ -3,12 +3,14 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Column
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Row
+from crispy_forms.layout import Submit
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import BaseFormSet
 from django.forms import formset_factory
 from django.forms.formsets import DELETION_FIELD_NAME
 from django.urls import reverse
+from django.utils import timezone
 
 from .colony_management import get_colony
 
@@ -49,6 +51,49 @@ class LineForm(forms.Form):
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Column("line", css_class="mx-auto"),
+        )
+
+
+class LineStatisticsForm(forms.Form):
+    """Form to select line and date range for calculating historical statistics."""
+
+    line = forms.ChoiceField(
+        label="Line name",
+        choices=_fetch_line_choices,
+        required=True,
+    )
+
+    start_date = forms.DateField(
+        widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
+        required=False,
+        label="start date (optional)",
+    )
+    end_date = forms.DateField(
+        widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
+        required=False,
+        label="end date (optional)",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        date_fields = ["start_date", "end_date"]
+        today = timezone.localdate()
+        for field in date_fields:
+            self.fields[field].widget.attrs["max"] = today
+
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Row(
+                Column("line", css_class="col-md-4"),
+                Column("start_date", css_class="col-auto"),
+                Column("end_date", css_class="col-auto"),
+                Column(
+                    Submit("submit", "Calculate", css_class="btn btn-primary mb-3"),
+                    css_class="col-auto",
+                ),
+                css_class="justify-content-center align-items-end mt-5",
+            )
         )
 
 

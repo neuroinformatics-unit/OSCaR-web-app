@@ -12,6 +12,7 @@ from django.shortcuts import render
 from .colony_management import get_colony
 from .forms import GenotypeFormSet
 from .forms import LineForm
+from .forms import LineStatisticsForm
 
 if TYPE_CHECKING:
     from oscar_colony.breeding_scheme import BreedingScheme
@@ -65,7 +66,7 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
             context = _create_result_page_context(line_name, formset)
             return render(
                 request,
-                "optimiser/result.html",
+                "optimiser/optimisation_result.html",
                 context,
             )
 
@@ -75,6 +76,19 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
         )
 
     return render(request, "optimiser/select_genotypes.html", {"formset": formset})
+
+
+def line_statistics(request: HttpRequest) -> HttpResponse:
+
+    if request.method == "POST":
+        form = LineStatisticsForm(request.POST)
+        if form.is_valid():
+            # DO STUFF
+            pass
+    else:
+        form = LineStatisticsForm()
+
+    return render(request, "optimiser/line_stats.html", {"form": form})
 
 
 def _strip_decimal_places(input_value: float) -> str:

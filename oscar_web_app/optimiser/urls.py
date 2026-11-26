@@ -9,7 +9,7 @@ urlpatterns = [
     path("<int:line_id>/genotypes", views.select_genotypes, name="select_genotypes"),
     path(
         "line_stats",
-        TemplateView.as_view(template_name="optimiser/line_stats.html"),
+        views.line_statistics,
         name="line_stats",
     ),
     path(

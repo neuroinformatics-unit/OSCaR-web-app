@@ -258,7 +258,9 @@ def test_select_genotypes_post(
     )
 
     assert response.status_code == HTTPStatus.OK
-    assertTemplateUsed(response=response, template_name="optimiser/result.html")
+    assertTemplateUsed(
+        response=response, template_name="optimiser/optimisation_result.html"
+    )
 
     # Values should match those in the given line stats
     line_stats = get_colony().get_line_stats(line_name)
