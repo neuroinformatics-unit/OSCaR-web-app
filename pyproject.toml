@@ -32,7 +32,7 @@ dependencies = [
   "flower==2.2.0",
   "gunicorn==26.2.0",
   "hiredis==3.5.0",
-  "oscar-colony==0.0.9",
+  "oscar-colony==0.0.12",
   "pillow==12.2.0",
   "psycopg[binary]==3.3.4; platform_system=='Windows'",
   "psycopg[c]==3.3.4; platform_system!='Windows'",

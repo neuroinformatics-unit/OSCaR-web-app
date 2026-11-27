@@ -103,3 +103,31 @@ def convert_html_to_df(
         df[numeric_cols] = df[numeric_cols].astype(float)
 
     return df.astype(str)
+
+
+def create_formset_data(form_params: list[dict[str, Any]]) -> dict[str, Any]:
+    """Create some test formset data.
+
+    Parameters
+    ----------
+    form_params : list[dict[str, Any]]
+        A list of parameters for each generated form. Each set of parameters
+        is given as a dict, which will be added as form-{form-number}-{key} = value.
+
+    Returns
+    -------
+    dict[str, Any]
+        Generated formset data.
+    """
+
+    data = {
+        "form-TOTAL_FORMS": len(form_params),
+        "form-INITIAL_FORMS": 0,
+        "form-MIN_NUM_FORMS": 1,
+        "form-MAX_NUM_FORMS": 1000,
+    }
+    for i, params in enumerate(form_params):
+        for key, value in params.items():
+            data[f"form-{i}-{key}"] = value
+
+    return data

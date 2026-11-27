@@ -1,3 +1,4 @@
+import math
 from http import HTTPStatus
 
 import pandas as pd
@@ -6,6 +7,7 @@ from django.http import Http404
 from django.urls import reverse
 from oscar_colony.breeding_scheme import Genotype
 from oscar_colony.optimise.optimal_scheme_calculator import calculate_optimal_scheme
+from oscar_colony.optimise.surplus_summary import SexSplit
 from pytest_django.asserts import assertRaisesMessage
 from pytest_django.asserts import assertRedirects
 from pytest_django.asserts import assertTemplateUsed
@@ -15,6 +17,7 @@ from oscar_web_app.optimiser.forms import GenotypeFormSet
 from oscar_web_app.optimiser.forms import LineForm
 from oscar_web_app.optimiser.views import select_genotypes
 from tests.helpers import convert_html_to_df
+from tests.helpers import create_formset_data
 
 
 @pytest.fixture
@@ -82,7 +85,16 @@ def test_select_genotypes_get(logged_in_client, line_id, mutations):
     formset = response.context["formset"]
     assert isinstance(formset, GenotypeFormSet)
     assert len(formset) == 1
-    assert sorted(formset[0].fields.keys()) == ["DELETE", *mutations, "count"]
+    assert sorted(formset[0].fields.keys()) == sorted(
+        [
+            "DELETE",
+            *mutations,
+            "count_type",
+            "count_any_sex",
+            "count_males",
+            "count_females",
+        ]
+    )
 
     assertTemplateUsed(
         response=response, template_name="optimiser/select_genotypes.html"
@@ -104,57 +116,134 @@ def test_select_line_with_no_mutations(rf, mocker):
 
 
 @pytest.mark.parametrize(
-    ("line_id", "line_name", "form_params", "required_n_per_genotype"),
+    ("line_id", "line_name", "formset_params", "required_n_per_genotype"),
     [
         pytest.param(
             1,
             "Line-A",
-            {
-                "form-0-Mut-A": "WT",
-                "form-0-count": 5,
-                "form-1-Mut-A": "HET",
-                "form-1-count": 10,
-            },
+            [
+                {
+                    "Mut-A": "WT",
+                    "count_type": "any_sex",
+                    "count_any_sex": 5,
+                    "count_males": 1,
+                    "count_females": 1,
+                },
+                {
+                    "Mut-A": "HET",
+                    "count_type": "any_sex",
+                    "count_any_sex": 10,
+                    "count_males": 1,
+                    "count_females": 1,
+                },
+            ],
             {(Genotype.WT,): 5, (Genotype.HET,): 10},
-            id="1 mutation",
+            id="1 mutation (any sex)",
+        ),
+        pytest.param(
+            1,
+            "Line-A",
+            [
+                {
+                    "Mut-A": "WT",
+                    "count_type": "specific_sex",
+                    "count_any_sex": 1,
+                    "count_males": 20,
+                    "count_females": 30,
+                },
+                {
+                    "Mut-A": "HET",
+                    "count_type": "specific_sex",
+                    "count_any_sex": 1,
+                    "count_males": 14,
+                    "count_females": 32,
+                },
+            ],
+            {
+                (Genotype.WT,): SexSplit(n_males=20, n_females=30),
+                (Genotype.HET,): SexSplit(n_males=14, n_females=32),
+            },
+            id="1 mutation (specific sex)",
+        ),
+        pytest.param(
+            1,
+            "Line-A",
+            [
+                {
+                    "Mut-A": "WT",
+                    "count_type": "any_sex",
+                    "count_any_sex": 42,
+                    "count_males": 1,
+                    "count_females": 1,
+                },
+                {
+                    "Mut-A": "HET",
+                    "count_type": "specific_sex",
+                    "count_any_sex": 1,
+                    "count_males": 14,
+                    "count_females": 32,
+                },
+            ],
+            {(Genotype.WT,): 42, (Genotype.HET,): SexSplit(n_males=14, n_females=32)},
+            id="1 mutation (mixed sex)",
         ),
         pytest.param(
             2,
             "Line-AB",
-            {
-                "form-0-Mut-A": "WT",
-                "form-0-Mut-B": "HET",
-                "form-0-count": 15,
-                "form-1-Mut-A": "HOM",
-                "form-1-Mut-B": "HOM",
-                "form-1-count": 35,
-            },
+            [
+                {
+                    "Mut-A": "WT",
+                    "Mut-B": "HET",
+                    "count_type": "any_sex",
+                    "count_any_sex": 15,
+                    "count_males": 1,
+                    "count_females": 1,
+                },
+                {
+                    "Mut-A": "HOM",
+                    "Mut-B": "HOM",
+                    "count_type": "any_sex",
+                    "count_any_sex": 35,
+                    "count_males": 1,
+                    "count_females": 1,
+                },
+            ],
             {(Genotype.WT, Genotype.HET): 15, (Genotype.HOM, Genotype.HOM): 35},
-            id="2 mutations",
+            id="2 mutations (any sex)",
         ),
         pytest.param(
             3,
             "Line-ABC",
-            {
-                "form-0-Mut-A": "WT",
-                "form-0-Mut-B": "HET",
-                "form-0-Mut-C": "HOM",
-                "form-0-count": 23,
-                "form-1-Mut-A": "HOM",
-                "form-1-Mut-B": "WT",
-                "form-1-Mut-C": "HOM",
-                "form-1-count": 56,
-            },
+            [
+                {
+                    "Mut-A": "WT",
+                    "Mut-B": "HET",
+                    "Mut-C": "HOM",
+                    "count_type": "any_sex",
+                    "count_any_sex": 23,
+                    "count_males": 1,
+                    "count_females": 1,
+                },
+                {
+                    "Mut-A": "HOM",
+                    "Mut-B": "WT",
+                    "Mut-C": "HOM",
+                    "count_type": "any_sex",
+                    "count_any_sex": 56,
+                    "count_males": 1,
+                    "count_females": 1,
+                },
+            ],
             {
                 (Genotype.WT, Genotype.HET, Genotype.HOM): 23,
                 (Genotype.HOM, Genotype.WT, Genotype.HOM): 56,
             },
-            id="3 mutations",
+            id="3 mutations (any sex)",
         ),
     ],
 )
 def test_select_genotypes_post(
-    logged_in_client, line_id, line_name, form_params, required_n_per_genotype
+    logged_in_client, line_id, line_name, formset_params, required_n_per_genotype
 ):
     """
     Test submission of select genotypes form renders results page with
@@ -162,15 +251,10 @@ def test_select_genotypes_post(
     """
 
     # Form params that are the same for all cases
-    default_params = {
-        "form-TOTAL_FORMS": 2,
-        "form-INITIAL_FORMS": 0,
-        "form-MIN_NUM_FORMS": 1,
-        "form-MAX_NUM_FORMS": 1000,
-    }
+    formset_data = create_formset_data(formset_params)
     response = logged_in_client.post(
         reverse("optimiser:select_genotypes", args=[line_id]),
-        default_params | form_params,
+        formset_data,
     )
 
     assert response.status_code == HTTPStatus.OK
@@ -178,33 +262,32 @@ def test_select_genotypes_post(
 
     # Values should match those in the given line stats
     line_stats = get_colony().get_line_stats(line_name)
+    context = response.context
 
     # Line stats context
-    assert response.context["line_name"] == line_stats.line_name
-    assert response.context["mutations"] == line_stats.mutations
-    assert response.context["stats_total_n"] == line_stats.total_n_offspring
-    assert (
-        response.context["stats_genotyped_n"] == line_stats.total_n_genotyped_offspring
-    )
-    assert response.context["stats_matings_n"] == line_stats.total_n_successful_matings
-    assert response.context["stats_litter_size"] == line_stats.average_litter_size
+    assert context["line_name"] == line_stats.line_name
+    assert context["mutations"] == line_stats.mutations
+    assert context["stats_total_n"] == line_stats.total_n_offspring
+    assert context["stats_genotyped_n"] == line_stats.total_n_genotyped_offspring
+    assert context["stats_sexed_n"] == line_stats.total_n_sexed_offspring
+    assert context["stats_matings_n"] == line_stats.total_n_successful_matings
+    assert context["stats_litter_size"] == round(line_stats.average_litter_size, 2)
+    assert context["stats_proportion_male"] == round(line_stats.proportion_male, 2)
 
     pd.testing.assert_frame_equal(
-        convert_html_to_df(response.context["stats_genotype_table"]),
+        convert_html_to_df(context["stats_genotype_table"]),
         line_stats.create_n_per_genotype_df().astype(str),
     )
     pd.testing.assert_frame_equal(
-        convert_html_to_df(response.context["stats_scheme_summary_table"]),
+        convert_html_to_df(context["stats_scheme_summary_table"]),
         line_stats.create_scheme_summary_df(decimal_places=2).astype(str),
     )
     pd.testing.assert_frame_equal(
-        convert_html_to_df(
-            response.context["stats_scheme_number_table"], numeric_as_float=True
-        ),
+        convert_html_to_df(context["stats_scheme_number_table"], numeric_as_float=True),
         line_stats.create_scheme_number_df().astype(str),
     )
     pd.testing.assert_frame_equal(
-        convert_html_to_df(response.context["stats_scheme_proportion_table"]),
+        convert_html_to_df(context["stats_scheme_proportion_table"]),
         line_stats.create_scheme_proportion_df(decimal_places=2).astype(str),
     )
 
@@ -214,17 +297,19 @@ def test_select_genotypes_post(
     )
 
     # optimisation result context
-    assert response.context["total_n"] == round(surplus.total_n, 2)
-    assert response.context["total_surplus"] == round(surplus.total_n_surplus, 2)
-    assert response.context["required_n"] == surplus.total_n - surplus.total_n_surplus
+    assert context["total_n"] == round(surplus.total_n, 2)
+    assert context["total_surplus"] == math.ceil(surplus.total_n_surplus)
+    assert context["required_n"] == int(surplus.total_n - surplus.total_n_surplus)
 
     pd.testing.assert_frame_equal(
-        convert_html_to_df(response.context["scheme_table"]),
+        convert_html_to_df(context["scheme_table"]),
         pd.DataFrame(
             breeding_schemes.items(), columns=("Scheme", "N matings"), dtype=str
         ),
     )
     pd.testing.assert_frame_equal(
-        convert_html_to_df(response.context["surplus_genotype_table"]),
-        surplus.create_genotype_df(decimal_places=2).astype(str),
+        convert_html_to_df(context["surplus_genotype_table"]),
+        surplus.create_genotype_df(
+            decimal_places=2, round_up_total_surplus=True
+        ).astype(str),
     )

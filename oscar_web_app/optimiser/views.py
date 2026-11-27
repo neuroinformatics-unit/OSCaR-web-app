@@ -1,3 +1,4 @@
+import math
 from typing import TYPE_CHECKING
 from typing import Any
 
@@ -179,8 +180,10 @@ def _create_line_stats_context(
         "mutations": line_stats.mutations,
         "stats_total_n": line_stats.total_n_offspring,
         "stats_genotyped_n": line_stats.total_n_genotyped_offspring,
+        "stats_sexed_n": line_stats.total_n_sexed_offspring,
         "stats_matings_n": line_stats.total_n_successful_matings,
         "stats_litter_size": round(line_stats.average_litter_size, decimal_places),
+        "stats_proportion_male": round(line_stats.proportion_male, decimal_places),
         "stats_genotype_table": n_per_genotype_df,
         "stats_scheme_summary_table": scheme_summary_df,
         "stats_scheme_number_table": scheme_number_df,
@@ -216,13 +219,18 @@ def _create_schemes_context(
     )
     scheme_table = _convert_to_html_table(scheme_table)
 
-    surplus_genotype_table = surplus.create_genotype_df(decimal_places)
-    surplus_genotype_table = _convert_to_html_table(surplus_genotype_table)
+    surplus_genotype_table = _convert_to_html_table(
+        surplus.create_genotype_df(
+            decimal_places=decimal_places, round_up_total_surplus=True
+        )
+    )
 
     return {
         "scheme_table": scheme_table,
         "total_n": round(surplus.total_n, decimal_places),
-        "total_surplus": round(surplus.total_n_surplus, decimal_places),
-        "required_n": round(surplus.total_n - surplus.total_n_surplus, decimal_places),
+        "total_surplus": math.ceil(surplus.total_n_surplus),
+        # required_n is always a whole number, so int() to display like
+        # 35, rather than 35.0
+        "required_n": int(surplus.total_n - surplus.total_n_surplus),
         "surplus_genotype_table": surplus_genotype_table,
     }
