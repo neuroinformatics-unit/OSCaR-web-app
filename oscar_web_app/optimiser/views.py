@@ -7,6 +7,8 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.shortcuts import render
 
+from oscar_web_app.optimiser.colony_management import ProcessingError
+
 from .colony_management import get_colony
 from .forms import GenotypeFormSet
 from .forms import LineForm
@@ -181,14 +183,19 @@ def _create_optimisation_result_context(
         Context required for results page
     """
     colony_management = get_colony()
-    line_stats, error_msg = colony_management.get_line_stats(line_name)
+    context = {"formset": formset}
 
-    if error_msg is not None:
-        messages.error(request, error_msg)
-    if line_stats is None:
-        return None
+    try:
+        line_stats = colony_management.get_line_stats(line_name)
+    except ProcessingError as e:
+        messages.error(request, str(e))
+        return context
 
-    schemes, surplus = colony_management.optimise_schemes(line_stats, formset)
+    try:
+        schemes, surplus = colony_management.optimise_schemes(line_stats, formset)
+    except ProcessingError as e:
+        messages.error(request, str(e))
+        return context
 
     # Convert breeding schemes into a table for easier viewing
     scheme_table = pd.DataFrame(
@@ -204,8 +211,7 @@ def _create_optimisation_result_context(
         )
     )
 
-    return {
-        "formset": formset,
+    return context | {
         "scheme_table": scheme_table,
         "total_n": round(surplus.total_n, decimal_places),
         "total_surplus": math.ceil(surplus.total_n_surplus),
@@ -235,20 +241,19 @@ def _create_line_stats_context(
     dict[str, Any]
         Context dict for line statistics results
     """
-
+    context = {"form": line_stats_form}
     line_name = line_stats_form.cleaned_data["line"]
     start_date = line_stats_form.cleaned_data["start_date"]
     end_date = line_stats_form.cleaned_data["end_date"]
 
     colony_management = get_colony()
-    line_stats, error_msg = colony_management.get_line_stats(
-        line_name=line_name, start_date=start_date, end_date=end_date
-    )
-
-    if error_msg is not None:
-        messages.error(request, error_msg)
-    if line_stats is None:
-        return None
+    try:
+        line_stats = colony_management.get_line_stats(
+            line_name=line_name, start_date=start_date, end_date=end_date
+        )
+    except ProcessingError as e:
+        messages.error(request, str(e))
+        return context
 
     n_per_genotype_df = _convert_to_html_table(line_stats.create_n_per_genotype_df())
     scheme_summary_df = _convert_to_html_table(
@@ -261,8 +266,7 @@ def _create_line_stats_context(
         line_stats.create_scheme_proportion_df(decimal_places)
     )
 
-    return {
-        "form": line_stats_form,
+    return context | {
         "stats_total_n": line_stats.total_n_offspring,
         "stats_genotyped_n": line_stats.total_n_genotyped_offspring,
         "stats_sexed_n": line_stats.total_n_sexed_offspring,

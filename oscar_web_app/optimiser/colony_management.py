@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 
 import pandas as pd
 from django.conf import settings
-from django.http import Http404
 from oscar_colony.breeding_scheme import BreedingScheme
 from oscar_colony.breeding_scheme import Genotype
 from oscar_colony.colony_management.pyrat.api import get_pyrat_data
@@ -28,6 +27,10 @@ if TYPE_CHECKING:
     from django.forms import BaseFormSet
 
     from oscar_web_app.optimiser.forms import GenotypeForm
+
+
+class ProcessingError(Exception):
+    """Raised for backend processing issues whose message is safe to show to users."""
 
 
 class ColonySoftware(StrEnum):
@@ -137,9 +140,9 @@ class ColonyManagement(ABC):
             breeding_schemes, surplus = calculate_optimal_scheme(
                 required_n_per_genotype, line_stats=line_stats, default_litter_size=6
             )
-        except ValueError as exc:
+        except Exception as exc:
             msg = "Optimisation failed for this line / genotypes combination."
-            raise Http404(msg) from exc
+            raise ProcessingError(msg) from exc
 
         return breeding_schemes, surplus
 
@@ -166,8 +169,8 @@ class ColonyPyRAT(ColonyManagement):
         line_name: str,
         start_date: date | None = None,
         end_date: date | None = None,
-    ) -> tuple[LineStatistics | None, str | None]:
-        """Get historical stats for the given line, and record any error messages."""
+    ) -> LineStatistics:
+        """Get historical stats for the given line."""
 
         # Fetch all available animal data for the line
         animal_data = get_pyrat_data(
@@ -190,17 +193,18 @@ class ColonyPyRAT(ColonyManagement):
                     msg += f" after {start_date.isoformat()}"
                 elif end_date:
                     msg += f" before {end_date.isoformat()}"
-                return None, msg
+                raise ProcessingError(msg)
 
             standard_df = standardise_pyrat_csv(animal_df)
             standardised_dfs.append(standard_df)
 
         merged_df = pd.concat(standardised_dfs)
         if merged_df.empty:
-            return None, "No animals remain for chosen line after standardisation"
+            msg = "No animals remain for chosen line after standardisation"
+            raise ProcessingError(msg)
 
         # Calculate historical stats across all standardised data
-        return calculate_historical_stats_for_line(merged_df, line_name), None
+        return calculate_historical_stats_for_line(merged_df, line_name)
 
 
 class ColonyDev(ColonyManagement):
@@ -561,4 +565,4 @@ class ColonyDev(ColonyManagement):
                 return line_stats
 
         msg = f"line stats not found for line name: {line_name}"
-        raise ValueError(msg)
+        raise ProcessingError(msg)
