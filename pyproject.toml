@@ -32,7 +32,7 @@ dependencies = [
   "flower==2.2.0",
   "gunicorn==26.2.0",
   "hiredis==3.5.0",
-  "oscar-colony==0.0.11",
+  "oscar-colony==0.0.12",
   "pillow==12.2.0",
   "psycopg[binary]==3.3.4; platform_system=='Windows'",
   "psycopg[c]==3.3.4; platform_system!='Windows'",
@@ -79,9 +79,6 @@ docs = [
 
 [tool.setuptools]
 packages = [ "oscar_web_app" ]
-
-[tool.uv]
-sources.oscar-colony = { git = "https://github.com/neuroinformatics-unit/OSCaR", rev = "km/rounding" }
 
 # ==== djLint ====
 [tool.djlint]
