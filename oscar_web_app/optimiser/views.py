@@ -61,17 +61,23 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
 
             # Run optimisation calculations and render the results
             context = _create_optimisation_result_context(request, line_name, formset)
+            context["formset"] = formset
             return render(
                 request,
                 "optimiser/optimisation_result.html",
                 context,
             )
-
-    else:
-        formset = GenotypeFormSet(
-            form_kwargs={"mutation_names": mutations}, error_messages=error_messages
+        # show the invalid formset with any errors displayed
+        response = render(
+            request, "optimiser/select_genotypes.html", {"formset": formset}
         )
+        response["HX-Retarget"] = "#genotype-form-container"
+        return response
 
+    # show the empty formset
+    formset = GenotypeFormSet(
+        form_kwargs={"mutation_names": mutations}, error_messages=error_messages
+    )
     return render(request, "optimiser/select_genotypes.html", {"formset": formset})
 
 

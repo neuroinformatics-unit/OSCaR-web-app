@@ -1,0 +1,31 @@
+{% load crispy_forms_tags %}
+
+<h1 class="fs-5">Experimental cohort</h1>
+<form action=""
+      method="post"
+      hx-post="{{ request.path }}"
+      hx-target="#results-container"
+      hx-indicator="#results-spinner">
+  {% csrf_token %}
+  {{ formset.management_form }}
+  {% comment %} Display any formset errors {% endcomment %}
+  {% if formset.non_form_errors %}
+    <div class="alert alert-danger d-flex justify-content-center align-items-center">{{ formset.non_form_errors }}</div>
+  {% endif %}
+  {% comment %} Display the formset, hiding rows if the form.DELETE checkbox
+  has been ticked {% endcomment %}
+  <div id="genotype-forms">
+    {% for form in formset %}
+      <div class="{% if form.DELETE.value %}deleted{% endif %}">{% crispy form %}</div>
+    {% endfor %}
+  </div>
+  {% comment %} Buttons to interact with the formset {% endcomment %}
+  <button type="button" id="add-genotype" class="btn btn-secondary d-block">Add Genotype</button>
+  <div class="d-flex justify-content-center">
+    <input type="submit" value="OSCaR Calculation" class="btn btn-primary px-5" />
+  </div>
+  {% comment %} Hidden empty form, used via js for adding new rows {% endcomment %}
+  <template id="empty-form">
+    {% crispy formset.empty_form %}
+  </template>
+</form>
