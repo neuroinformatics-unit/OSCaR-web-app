@@ -4,9 +4,6 @@ from typing import Any
 
 import pandas as pd
 from django.contrib import messages
-from django.http import Http404
-from django.http import HttpRequest
-from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 
@@ -16,6 +13,9 @@ from .forms import LineForm
 from .forms import LineStatisticsForm
 
 if TYPE_CHECKING:
+    from django.http import HttpRequest
+    from django.http import HttpResponse
+
     from .colony_management import BaseFormSet
     from .colony_management import GenotypeForm
 
@@ -53,8 +53,8 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
     # Fetch mutation names to create custom fields in the Genotype forms
     mutations = get_colony().get_line_mutations(line_id)
     if len(mutations) == 0:
-        msg = "No mutations found for chosen line"
-        raise Http404(msg)
+        messages.error(request, "No mutations found for chosen line")
+        return render(request, "optimiser/select_genotypes.html", {})
 
     error_messages = {"too_few_forms": "Please provide at least one genotype"}
 
