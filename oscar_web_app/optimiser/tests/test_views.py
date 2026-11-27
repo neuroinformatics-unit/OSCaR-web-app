@@ -259,7 +259,8 @@ def test_select_genotypes_post(
 
     assert response.status_code == HTTPStatus.OK
     assertTemplateUsed(
-        response=response, template_name="optimiser/optimisation_result.html"
+        response=response,
+        template_name="optimiser/breeding_plan/optimisation_result.html",
     )
 
     # Values should match those in the given line stats

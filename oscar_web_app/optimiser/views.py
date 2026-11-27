@@ -35,7 +35,7 @@ def select_line(request: HttpRequest) -> HttpResponse:
             if line_id == "":
                 return render(
                     request,
-                    "optimiser/select_genotypes.html",
+                    "optimiser/breeding_plan/select_genotypes.html",
                     {},
                 )
 
@@ -47,7 +47,7 @@ def select_line(request: HttpRequest) -> HttpResponse:
     else:
         form = LineForm()
 
-    return render(request, "optimiser/breeding_plan.html", {"form": form})
+    return render(request, "optimiser/breeding_plan/breeding_plan.html", {"form": form})
 
 
 def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
@@ -56,7 +56,7 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
     mutations = get_colony().get_line_mutations(line_id)
     if len(mutations) == 0:
         messages.error(request, "No mutations found for chosen line")
-        return render(request, "optimiser/select_genotypes.html", {})
+        return render(request, "optimiser/breeding_plan/select_genotypes.html", {})
 
     error_messages = {"too_few_forms": "Please provide at least one genotype"}
 
@@ -77,13 +77,15 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
             context = _create_optimisation_result_context(request, line_name, formset)
             return render(
                 request,
-                "optimiser/optimisation_result.html",
+                "optimiser/breeding_plan/optimisation_result.html",
                 context,
             )
 
         # show the invalid formset with any errors displayed
         response = render(
-            request, "optimiser/select_genotypes.html", {"formset": formset}
+            request,
+            "optimiser/breeding_plan/select_genotypes.html",
+            {"formset": formset},
         )
         response["HX-Retarget"] = "#genotype-form-container"
         return response
@@ -92,7 +94,9 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
     formset = GenotypeFormSet(
         form_kwargs={"mutation_names": mutations}, error_messages=error_messages
     )
-    return render(request, "optimiser/select_genotypes.html", {"formset": formset})
+    return render(
+        request, "optimiser/breeding_plan/select_genotypes.html", {"formset": formset}
+    )
 
 
 def line_statistics(request: HttpRequest) -> HttpResponse:
@@ -104,18 +108,20 @@ def line_statistics(request: HttpRequest) -> HttpResponse:
             context = _create_line_stats_context(request, form)
             return render(
                 request,
-                "optimiser/line_stats_result.html",
+                "optimiser/line_stats/line_stats_result.html",
                 context,
             )
 
         # show the invalid form with any errors displayed
-        response = render(request, "optimiser/line_stats_form.html", {"form": form})
+        response = render(
+            request, "optimiser/line_stats/line_stats_form.html", {"form": form}
+        )
         response["HX-Retarget"] = "#line-stats-form-container"
         return response
 
     # show the empty form
     form = LineStatisticsForm()
-    return render(request, "optimiser/line_stats.html", {"form": form})
+    return render(request, "optimiser/line_stats/line_stats.html", {"form": form})
 
 
 def _strip_decimal_places(input_value: float) -> str:
