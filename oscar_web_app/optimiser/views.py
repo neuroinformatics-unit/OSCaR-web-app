@@ -35,7 +35,7 @@ def select_line(request: HttpRequest) -> HttpResponse:
             if line_id == "":
                 return render(
                     request,
-                    "optimiser/breeding_plan/select_genotypes.html",
+                    "optimiser/breeding_plan/genotype_section.html",
                     {},
                 )
 
@@ -56,7 +56,7 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
     mutations = get_colony().get_line_mutations(line_id)
     if len(mutations) == 0:
         messages.error(request, "No mutations found for chosen line")
-        return render(request, "optimiser/breeding_plan/select_genotypes.html", {})
+        return render(request, "optimiser/breeding_plan/genotype_section.html", {})
 
     error_messages = {"too_few_forms": "Please provide at least one genotype"}
 
@@ -84,7 +84,7 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
         # show the invalid formset with any errors displayed
         response = render(
             request,
-            "optimiser/breeding_plan/select_genotypes.html",
+            "optimiser/breeding_plan/genotype_section.html",
             {"formset": formset},
         )
         response["HX-Retarget"] = "#genotype-form-container"
@@ -95,7 +95,7 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
         form_kwargs={"mutation_names": mutations}, error_messages=error_messages
     )
     return render(
-        request, "optimiser/breeding_plan/select_genotypes.html", {"formset": formset}
+        request, "optimiser/breeding_plan/genotype_section.html", {"formset": formset}
     )
 
 
@@ -108,13 +108,13 @@ def line_statistics(request: HttpRequest) -> HttpResponse:
             context = _create_line_stats_context(request, form)
             return render(
                 request,
-                "optimiser/line_stats/line_stats_result.html",
+                "optimiser/line_stats/result.html",
                 context,
             )
 
         # show the invalid form with any errors displayed
         response = render(
-            request, "optimiser/line_stats/line_stats_form.html", {"form": form}
+            request, "optimiser/line_stats/form_section.html", {"form": form}
         )
         response["HX-Retarget"] = "#line-stats-form-container"
         return response
