@@ -75,3 +75,5 @@
     </div>
   </div>
 {% endif %}
+{% comment %} Re-render line stats form when result is shown (this will remove any previously displayed validation errors) {% endcomment %}
+<div id="line-stats-form-container" hx-swap-oob="true">{% include "optimiser/line_stats_form.html" %}</div>

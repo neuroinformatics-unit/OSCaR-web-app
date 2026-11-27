@@ -51,7 +51,7 @@ class LineForm(forms.Form):
     line = forms.ChoiceField(
         label="Line name",
         choices=_fetch_line_choices(return_ids=True),
-        required=True,
+        required=False,  # Allows the blank option --- to be re-selected without error
     )
 
     def __init__(self, *args, **kwargs):
@@ -90,7 +90,7 @@ class LineStatisticsForm(forms.Form):
     )
 
     def clean(self):
-        """Error end_date is before start_date."""
+        """Error if end_date is before start_date."""
 
         cleaned_data = super().clean()
         if cleaned_data is None:
@@ -113,8 +113,8 @@ class LineStatisticsForm(forms.Form):
         self.helper = FormHelper()
         self.helper.attrs = {
             "hx-post": reverse("optimiser:line_stats"),
-            "hx-target": "#line-stats-container",
-            "hx-indicator": "#line-stats-spinner",
+            "hx-target": "#line-stats-results-container",
+            "hx-indicator": "#line-stats-results-spinner",
         }
         self.helper.layout = Layout(
             Row(

@@ -24,7 +24,19 @@ def select_line(request: HttpRequest) -> HttpResponse:
 
     if request.method == "POST":
         form = LineForm(request.POST)
+
         if form.is_valid():
+            line_id = form.cleaned_data["line"]
+
+            # If the blank option is selected - render select genotypes with no context.
+            # This will clear both the genotype form + results area.
+            if line_id == "":
+                return render(
+                    request,
+                    "optimiser/select_genotypes.html",
+                    {},
+                )
+
             line_id = int(form.cleaned_data["line"])
             line_name = dict(form.fields["line"].choices)[line_id]  # type: ignore[attr-defined]
             request.session[str(line_id)] = line_name
@@ -61,7 +73,6 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
 
             # Run optimisation calculations and render the results
             context = _create_optimisation_result_context(request, line_name, formset)
-            context["formset"] = formset
             return render(
                 request,
                 "optimiser/optimisation_result.html",
@@ -94,9 +105,14 @@ def line_statistics(request: HttpRequest) -> HttpResponse:
                 "optimiser/line_stats_result.html",
                 context,
             )
-    else:
-        form = LineStatisticsForm()
 
+        # show the invalid form with any errors displayed
+        response = render(request, "optimiser/line_stats_form.html", {"form": form})
+        response["HX-Retarget"] = "#line-stats-form-container"
+        return response
+
+    # show the empty form
+    form = LineStatisticsForm()
     return render(request, "optimiser/line_stats.html", {"form": form})
 
 
@@ -189,6 +205,7 @@ def _create_optimisation_result_context(
     )
 
     return {
+        "formset": formset,
         "scheme_table": scheme_table,
         "total_n": round(surplus.total_n, decimal_places),
         "total_surplus": math.ceil(surplus.total_n_surplus),
@@ -245,6 +262,7 @@ def _create_line_stats_context(
     )
 
     return {
+        "form": line_stats_form,
         "stats_total_n": line_stats.total_n_offspring,
         "stats_genotyped_n": line_stats.total_n_genotyped_offspring,
         "stats_sexed_n": line_stats.total_n_sexed_offspring,
