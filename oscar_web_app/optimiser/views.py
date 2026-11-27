@@ -67,6 +67,7 @@ def select_genotypes(request: HttpRequest, line_id: int) -> HttpResponse:
                 "optimiser/optimisation_result.html",
                 context,
             )
+
         # show the invalid formset with any errors displayed
         response = render(
             request, "optimiser/select_genotypes.html", {"formset": formset}

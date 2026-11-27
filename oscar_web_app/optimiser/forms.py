@@ -89,6 +89,19 @@ class LineStatisticsForm(forms.Form):
         label="end date (optional)",
     )
 
+    def clean(self):
+        """Error end_date is before start_date."""
+
+        cleaned_data = super().clean()
+        if cleaned_data is None:
+            return
+
+        start_date = cleaned_data.get("start_date")
+        end_date = cleaned_data.get("end_date")
+        if start_date and end_date and end_date < start_date:
+            msg = "End date cannot be before the start date."
+            raise ValidationError(msg)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
